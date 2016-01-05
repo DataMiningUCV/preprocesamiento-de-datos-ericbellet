@@ -26,6 +26,13 @@ def RepresentsInt(s):
         return True
     except ValueError:
         return False
+        
+def RepresentsFloat(s):
+    try: 
+        float(s)
+        return True
+    except ValueError:
+        return False
 #------------------------------------------------------------------------------
 #REALIZO UN CAMBIO EN EL NOMBRE DE LAS COLUMNAS
 data_file = open('data.csv', 'rb')
@@ -35,7 +42,7 @@ header = data_file_object.next()
 #Creo otro .csv identico al original pero con los nombre modificados
 data2_file = open("data2.csv", "wb")
 data2_file_object = csv.writer(data2_file)
-data2_file_object.writerow(["ID", "PeriodoAcademicoarenovar", "CedulaDeIdentidad", "FechadeNacimiento", "Edad", "EstadoCivil", "Sexo", "Escuela", "AnodeIngresoalaUCV", "ModalidaddeIngresoalaUCV", "Semestrequecursa", "Hacambiadousteddedireccion", "Deserafirmativoindiqueelmotivo", "Numerodemateriasinscritasenelsemestreoanoanterior", "Numerodemateriaaprobadasenelsemestreoanoanterior", "Numerodemateriasretiradasenelsemestreoanoanterior", "Numerodemateriasreprobadasenelsemestreoanoanterior", "Promedioponderadoaprobado", "Eficiencia", "Sireprobounaomasmateriasindiqueelmotivo", "Numerodemateriasinscritasenelsemestreencurso", "Seencuentrarealizandotesisopasantiasdegrado", "Cantidaddevecesqueharealizadotesisopasantiasdegrado", "Procedencia", "LugardonderesidemientrasestudiaenlaUniversidad", "Personasconlascualesustedvivemientrasestudiaenlauniversidad", "Tipodeviviendadonderesidemientrasestudiaenlauniversidad", "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual", "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada", "Contrajomatrimonio", "HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion.", "Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo", "Seencuentraustedrealizandoalgunaactividadquelegenereingresos", "Encasodeserafirmativoindiquetipodeactividadysufrecuencia", "Montomensualdelabeca",  "Aportemensualquelebrindasuresponsableeconomico", "Aportemensualquerecibedefamiliaresoamigos", "Ingresomensualquerecibeporactividadesadestajooporhoras", "Ingresomensualtotal", "Gastosenalimentacionpersonal", "Gastosentransportepersonal", "Gastosmedicospersonal", "Gastosodontologicospersonal", "Gastospersonales", "Gastosenresidenciaohabitacionalquiladapersonal", "GastosenMaterialesdeestudiopersonal", "Gastosenrecreacionpersonal", "Otrosgastospersonal", "Totalegresospersonal", "Indiquequienessuresponsableeconomico", "Cargafamiliar", "Ingresomensualdesuresponsableeconomico", "Otrosingresos", "Totaldeingresos", "Gastosenviviendadesusresponsableseconomicos ", "Gastosenalimentaciondesusresponsableseconomicos",  "Gastosentransportedesusresponsableseconomicos", "Gastosmedicosdesusresponsableseconomicos", "Gastosodontologicosdesusresponsableseconomicos", "Gastoseducativosdesusresponsableseconomicos", "Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos", "Condominiodesusresponsableseconomicos", "Otrosgastosdesusresponsableseconomicos", "Totaldeegresosdesusresponsableseconomicos", "DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE", "Sugerenciasyrecomendacionesparamejorarnuestraatencion"])
+data2_file_object.writerow(["ID", "PeriodoAcademicoarenovar", "CedulaDeIdentidad", "FechadeNacimiento", "Edad", "EstadoCivil", "Sexo", "Escuela", "AnodeIngresoalaUCV", "ModalidaddeIngresoalaUCV", "Semestrequecursa", "Hacambiadousteddedireccion", "Deserafirmativoindiqueelmotivo", "Numerodemateriasinscritasenelsemestreoanoanterior", "Numerodemateriaaprobadasenelsemestreoanoanterior", "Numerodemateriasretiradasenelsemestreoanoanterior", "Numerodemateriasreprobadasenelsemestreoanoanterior", "Promedioponderadoaprobado", "Eficiencia", "Sireprobounaomasmateriasindiqueelmotivo", "Numerodemateriasinscritasenelsemestreencurso", "Seencuentrarealizandotesisopasantiasdegrado", "Cantidaddevecesqueharealizadotesisopasantiasdegrado", "Procedencia", "LugardonderesidemientrasestudiaenlaUniversidad", "Personasconlascualesustedvivemientrasestudiaenlauniversidad", "Tipodeviviendadonderesidemientrasestudiaenlauniversidad", "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual", "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada", "Contrajomatrimonio", "HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion", "Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo", "Seencuentraustedrealizandoalgunaactividadquelegenereingresos", "Encasodeserafirmativoindiquetipodeactividadysufrecuencia", "Montomensualdelabeca",  "Aportemensualquelebrindasuresponsableeconomico", "Aportemensualquerecibedefamiliaresoamigos", "Ingresomensualquerecibeporactividadesadestajooporhoras", "Ingresomensualtotal", "Gastosenalimentacionpersonal", "Gastosentransportepersonal", "Gastosmedicospersonal", "Gastosodontologicospersonal", "Gastospersonales", "Gastosenresidenciaohabitacionalquiladapersonal", "GastosenMaterialesdeestudiopersonal", "Gastosenrecreacionpersonal", "Otrosgastospersonal", "Totalegresospersonal", "Indiquequienessuresponsableeconomico", "Cargafamiliar", "Ingresomensualdesuresponsableeconomico", "Otrosingresos", "Totaldeingresos", "Gastosenviviendadesusresponsableseconomicos", "Gastosenalimentaciondesusresponsableseconomicos",  "Gastosentransportedesusresponsableseconomicos", "Gastosmedicosdesusresponsableseconomicos", "Gastosodontologicosdesusresponsableseconomicos", "Gastoseducativosdesusresponsableseconomicos", "Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos", "Condominiodesusresponsableseconomicos", "Otrosgastosdesusresponsableseconomicos", "Totaldeegresosdesusresponsableseconomicos", "DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE", "Sugerenciasyrecomendacionesparamejorarnuestraatencion"])
 for row in data_file_object:       # For each row in test.csv
     data2_file_object.writerow(row)    # predict 0
 data_file.close()
@@ -352,47 +359,685 @@ for x in df['LugardonderesidemientrasestudiaenlaUniversidad']:
    
 #------------------------------------------------------------------------------"Personasconlascualesustedvivemientrasestudiaenlauniversidad"
 df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] = df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].map( {'residencia estudiantil':0, 'recidencia':0, 'residencia':0,'Residencia':0,'Esposo (a) Hijos (as) ': 1, 'Familiares paternos': 2, 'Madre': 3,'Familiares maternos': 4, 'Ambos padres': 5, 'Mi Mamá y mi hijo ': 6,'Padre': 7, 'Amigos': 8, 'madre y su esposo,abuela,y mi esposo': 9,'hermana': 10, 'Hermana': 10, 'dos hermanos':11, 'OTROS INQUILINOS': 12, 'hermanas':13, 'madre y hermana': 14, 'madre y hermanos':15, 'Madre y Hermanos':15, 'prima': 16, 'madrina':17, 'sola': 18, 'Mamá y Abuela': 19, 'madre,hermano e hijo':20, 'Madre, Hermano y Sobrina': 21, 'hermano, hermana y mi hijo': 22, 'compañeros de habitacion alquilada':23, 'Padres, hermana y abuelos maternos': 24, 'Madre, Hermana, Abuela': 25, 'abuela': 26, 'Dueños del apartamento donde alquilo la habitacion': 27, 'ambos padres y dos hermanis':28, 'Solo': 29, 'hermano':30, 'dueña del apartamento': 31, 'Madre y hermano': 32} ).astype(float)
-df['Personasconlascualesustedvivemientrasestudiaenlauniversidad']
+
 #------------------------------------------------------------------------------"Tipodeviviendadonderesidemientrasestudiaenlauniversidad"
+df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'] = df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].map( {'Quinta o casa quinta':0, 'Apartamento en edifico': 1, 'Casa en barrio urbano': 2, 'Habitación alquilada': 3,'Casa de vecindad': 4, 'Residencia estudiantil': 5, 'Apartamento en quinta - casa quinta o casa': 6,'conserjería ': 7, 'Casa en barrio rural': 8, 'Casa de vecindad': 9,'casa': 10} ).astype(float)
+
 #------------------------------------------------------------------------------ "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual"
+print "ANALIZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR"
 #------------------------------------------------------------------------------ "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada"
+print "ANALIZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR"
 #------------------------------------------------------------------------------"Contrajomatrimonio"
+df['Contrajomatrimonio'] = df['Contrajomatrimonio'].map( {'No': 0, 'Si': 1} ).astype(int)
+
 #------------------------------------------------------------------------------"HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion."
+df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion'] = df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion'].map( {'No': 0, 'Si': 1} ).astype(int)
+
 #------------------------------------------------------------------------------"Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo"
+df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].fillna(0, inplace=True)
+df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'] = df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].map( {0:0,'2012, OBE. AYUDA ECONÓMICA. SOLVENTAR GASTOS DE ESTUDIOS Y TRANSPORTE.':13, 'OBE 2011 UCV . Motivo: ayuda económica para mis estudios ': 1, 'AÑO 2011 AYUDA ECONÓMICA POR OBE PARA CUBRIR GASTOS  DE MATERIAL DE ESTUDIO.': 2, 'Beca ayudantía en el año 2011 Universidad Central de Venezuela (OBE) apoyo económico para material de estudio': 3,'solicitud en 2013. \nayuda economica \n': 4, 'Año solicitud 2013\nInstitución: Universidad Central de Venezuela (OBE)\nMotivo: Transporte, Materiales Estudios, Comida': 5, 'fames ayuda para maternidad': 6,'2015, ucv, falta de ingresos, ayuda economica': 7, 'Año: 2013. Institucion: OBE. Motivo: ayuda económica para rehabilitación (fisioterapia), ya que me atropello una moto.': 8, 'Año:2014 \nInstitucion: OBE\nMotivo: Compra de materiales de estudio. ': 9,'fecha:2014\ninstituto:OBE\ncompras de material de estudio': 10,'solicitud 2015 en el instituto OBE , motivo ayuda economica para gastos de la universidad (libro, pasaje, equipo de enfermeria, etc)': 11,'año 2014, OBE, solicitada para cubrir parte de los gastos mensuales estudiantiles': 12} ).astype(float)
+
 #------------------------------------------------------------------------------ "Seencuentraustedrealizandoalgunaactividadquelegenereingresos"
- #------------------------------------------------------------------------------"Encasodeserafirmativoindiquetipodeactividadysufrecuencia"
- #------------------------------------------------------------------------------"Montomensualdelabeca"
- #------------------------------------------------------------------------------ "Aportemensualquelebrindasuresponsableeconomico"
- #------------------------------------------------------------------------------"Aportemensualquerecibedefamiliaresoamigos"
- #------------------------------------------------------------------------------"Ingresomensualquerecibeporactividadesadestajooporhoras"
- #------------------------------------------------------------------------------"Ingresomensualtotal"
- #------------------------------------------------------------------------------"Gastosenalimentacionpersonal"
- #------------------------------------------------------------------------------"Gastosentransportepersonal"
- #------------------------------------------------------------------------------"Gastosmedicospersonal"
- #------------------------------------------------------------------------------"Gastosodontologicospersonal"
- #------------------------------------------------------------------------------"Gastospersonales"
- #------------------------------------------------------------------------------"Gastosenresidenciaohabitacionalquiladapersonal"
- #------------------------------------------------------------------------------"GastosenMaterialesdeestudiopersonal"
- #------------------------------------------------------------------------------"Gastosenrecreacionpersonal"
- #------------------------------------------------------------------------------"Otrosgastospersonal"
- #------------------------------------------------------------------------------"Totalegresospersonal"
- #------------------------------------------------------------------------------"Indiquequienessuresponsableeconomico"
- #------------------------------------------------------------------------------"Cargafamiliar"
- #------------------------------------------------------------------------------"Ingresomensualdesuresponsableeconomico"
- #------------------------------------------------------------------------------"Otrosingresos"
- #------------------------------------------------------------------------------"Totaldeingresos"
- #------------------------------------------------------------------------------"Gastosenviviendadesusresponsableseconomicos"
- #------------------------------------------------------------------------------"Gastosenalimentaciondesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Gastosentransportedesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Gastosmedicosdesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Gastosodontologicosdesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Gastoseducativosdesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Condominiodesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Otrosgastosdesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"Totaldeegresosdesusresponsableseconomicos"
-  #------------------------------------------------------------------------------"DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE"
- #------------------------------------------------------------------------------"Sugerenciasyrecomendacionesparamejorarnuestraatencion"
+df['Seencuentraustedrealizandoalgunaactividadquelegenereingresos'] = df['Seencuentraustedrealizandoalgunaactividadquelegenereingresos'].map( {'No': 0, 'Si': 1} ).astype(int)
+
+#------------------------------------------------------------------------------"Encasodeserafirmativoindiquetipodeactividadysufrecuencia"
+df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].fillna(0, inplace=True)
+df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'] = df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].map( {0:0,'cuido pacientes parapoder obtener un ingreso economico': 1, 'STAFF DE EMPRESA DEPORTAIVA. UNO O DOS FINES DE SEMANA AL MES APROXIMADAMENTE.': 2, 'Recreación, algunos fines de semana (poco frecuente por falta de tiempo).': 3,'Secretaria, sólo los sábados medio turno.': 4} ).astype(float)
+
+
+#------------------------------------------------------------------------------"Montomensualdelabeca"
+df.Montomensualdelabeca = df.Montomensualdelabeca.astype(float)
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Montomensualdelabeca'] - ndf6['Montomensualdelabeca'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Montomensualdelabeca'].std()  
+ndf6['Outlier'] = abs(ndf6['Montomensualdelabeca'] - ndf6['Montomensualdelabeca'].mean()) > 1.96*ndf6['Montomensualdelabeca'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Montomensualdelabeca'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Montomensualdelabeca'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()
+"""
+#------------------------------------------------------------------------------ "Aportemensualquelebrindasuresponsableeconomico"
+df['Aportemensualquelebrindasuresponsableeconomico'].fillna(0, inplace=True)
+df.Aportemensualquelebrindasuresponsableeconomico = df.Aportemensualquelebrindasuresponsableeconomico.astype(float)
+
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Aportemensualquelebrindasuresponsableeconomico'] - ndf6['Aportemensualquelebrindasuresponsableeconomico'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Aportemensualquelebrindasuresponsableeconomico'].std()  
+ndf6['Outlier'] = abs(ndf6['Aportemensualquelebrindasuresponsableeconomico'] - ndf6['Aportemensualquelebrindasuresponsableeconomico'].mean()) > 1.96*ndf6['Aportemensualquelebrindasuresponsableeconomico'].std()
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Aportemensualquelebrindasuresponsableeconomico'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Aportemensualquelebrindasuresponsableeconomico'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()
+"""
+#------------------------------------------------------------------------------"Aportemensualquerecibedefamiliaresoamigos"
+df['Aportemensualquerecibedefamiliaresoamigos'].fillna(0, inplace=True)
+df.Aportemensualquerecibedefamiliaresoamigos = df.Aportemensualquerecibedefamiliaresoamigos.astype(float)
+
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Aportemensualquerecibedefamiliaresoamigos'] - ndf6['Aportemensualquerecibedefamiliaresoamigos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Aportemensualquerecibedefamiliaresoamigos'].std()  
+ndf6['Outlier'] = abs(ndf6['Aportemensualquerecibedefamiliaresoamigos'] - ndf6['Aportemensualquerecibedefamiliaresoamigos'].mean()) > 1.96*ndf6['Aportemensualquerecibedefamiliaresoamigos'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Aportemensualquerecibedefamiliaresoamigos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Aportemensualquerecibedefamiliaresoamigos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()
+"""
+
+#------------------------------------------------------------------------------"Ingresomensualquerecibeporactividadesadestajooporhoras"
+
+df['Ingresomensualquerecibeporactividadesadestajooporhoras'].fillna(0, inplace=True)
+df.Ingresomensualquerecibeporactividadesadestajooporhoras = df.Ingresomensualquerecibeporactividadesadestajooporhoras.astype(float)
+
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'] - ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'].std()  
+ndf6['Outlier'] = abs(ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'] - ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'].mean()) > 1.96*ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()
+"""
+#------------------------------------------------------------------------------"Ingresomensualtotal"
+df['Ingresomensualtotal'] = df.Montomensualdelabeca + df.Aportemensualquelebrindasuresponsableeconomico + df.Aportemensualquerecibedefamiliaresoamigos + df.Ingresomensualquerecibeporactividadesadestajooporhoras
+
+
+#------------------------------------------------------------------------------"Gastosenalimentacionpersonal"
+df['Gastosenalimentacionpersonal'].fillna(0, inplace=True)
+df.Gastosenalimentacionpersonal = df.Gastosenalimentacionpersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosenalimentacionpersonal'] - ndf6['Gastosenalimentacionpersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosenalimentacionpersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosenalimentacionpersonal'] - ndf6['Gastosenalimentacionpersonal'].mean()) > 1.96*ndf6['Gastosenalimentacionpersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosenalimentacionpersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosenalimentacionpersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()
+"""
+#------------------------------------------------------------------------------"Gastosentransportepersonal"
+df['Gastosentransportepersonal'].fillna(0, inplace=True)
+df.Gastosentransportepersonal = df.Gastosentransportepersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosentransportepersonal'] - ndf6['Gastosentransportepersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosentransportepersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosentransportepersonal'] - ndf6['Gastosentransportepersonal'].mean()) > 1.96*ndf6['Gastosentransportepersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosentransportepersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosentransportepersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()
+"""
+#------------------------------------------------------------------------------"Gastosmedicospersonal"
+df['Gastosmedicospersonal'].fillna(0, inplace=True)
+df.Gastosmedicospersonal = df.Gastosmedicospersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosmedicospersonal'] - ndf6['Gastosmedicospersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosmedicospersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosmedicospersonal'] - ndf6['Gastosmedicospersonal'].mean()) > 1.96*ndf6['Gastosmedicospersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosmedicospersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosmedicospersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Gastosodontologicospersonal"
+df['Gastosodontologicospersonal'].fillna(0, inplace=True)
+df.Gastosodontologicospersonal = df.Gastosodontologicospersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosodontologicospersonal'] - ndf6['Gastosodontologicospersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosodontologicospersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosodontologicospersonal'] - ndf6['Gastosodontologicospersonal'].mean()) > 1.96*ndf6['Gastosodontologicospersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosodontologicospersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosodontologicospersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Gastospersonales"
+df['Gastospersonales'].fillna(0, inplace=True)
+df.Gastospersonales = df.Gastospersonales.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastospersonales'] - ndf6['Gastospersonales'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastospersonales'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastospersonales'] - ndf6['Gastospersonales'].mean()) > 1.96*ndf6['Gastospersonales'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastospersonales'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastospersonales'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Gastosenresidenciaohabitacionalquiladapersonal"
+df['Gastosenresidenciaohabitacionalquiladapersonal'].fillna(0, inplace=True)
+df.Gastosenresidenciaohabitacionalquiladapersonal = df.Gastosenresidenciaohabitacionalquiladapersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosenresidenciaohabitacionalquiladapersonal'] - ndf6['Gastosenresidenciaohabitacionalquiladapersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosenresidenciaohabitacionalquiladapersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosenresidenciaohabitacionalquiladapersonal'] - ndf6['Gastosenresidenciaohabitacionalquiladapersonal'].mean()) > 1.96*ndf6['Gastosenresidenciaohabitacionalquiladapersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosenresidenciaohabitacionalquiladapersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosenresidenciaohabitacionalquiladapersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"GastosenMaterialesdeestudiopersonal"
+df['GastosenMaterialesdeestudiopersonal'].fillna(0, inplace=True)
+df.GastosenMaterialesdeestudiopersonal = df.GastosenMaterialesdeestudiopersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['GastosenMaterialesdeestudiopersonal'] - ndf6['GastosenMaterialesdeestudiopersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['GastosenMaterialesdeestudiopersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['GastosenMaterialesdeestudiopersonal'] - ndf6['GastosenMaterialesdeestudiopersonal'].mean()) > 1.96*ndf6['GastosenMaterialesdeestudiopersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['GastosenMaterialesdeestudiopersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['GastosenMaterialesdeestudiopersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Gastosenrecreacionpersonal"
+df['Gastosenrecreacionpersonal'].fillna(0, inplace=True)
+df.Gastosenrecreacionpersonal = df.Gastosenrecreacionpersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosenrecreacionpersonal'] - ndf6['Gastosenrecreacionpersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosenrecreacionpersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosenrecreacionpersonal'] - ndf6['Gastosenrecreacionpersonal'].mean()) > 1.96*ndf6['Gastosenrecreacionpersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosenrecreacionpersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosenrecreacionpersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Otrosgastospersonal"
+df['Otrosgastospersonal'].fillna(0, inplace=True)
+df.Otrosgastospersonal = df.Otrosgastospersonal.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Otrosgastospersonal'] - ndf6['Otrosgastospersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Otrosgastospersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Otrosgastospersonal'] - ndf6['Otrosgastospersonal'].mean()) > 1.96*ndf6['Otrosgastospersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Otrosgastospersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Otrosgastospersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Totalegresospersonal"
+df['Totalegresospersonal'] = df.Gastosenalimentacionpersonal + df.Gastosentransportepersonal + df.Gastosmedicospersonal + df.Gastosodontologicospersonal + df.Gastospersonales + df.Gastosenresidenciaohabitacionalquiladapersonal + df.GastosenMaterialesdeestudiopersonal + df.Gastosenrecreacionpersonal + df.Otrosgastospersonal
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Totalegresospersonal'] - ndf6['Totalegresospersonal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Totalegresospersonal'].std()  
+ndf6['Outlier'] = abs(ndf6['Totalegresospersonal'] - ndf6['Totalegresospersonal'].mean()) > 1.96*ndf6['Totalegresospersonal'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Totalegresospersonal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Totalegresospersonal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Indiquequienessuresponsableeconomico"
+df['Indiquequienessuresponsableeconomico'] = df['Indiquequienessuresponsableeconomico'].map( {'Usted mismo':0,'esposo': 1, 'ninguno': 2, 'Madre': 3,'Familiares': 4, 'Padre': 5, 'Ambos padres': 6,'Cónyugue': 7, 'tia': 8, 'Hermano': 9,'hermana': 10,'MI HERMANA': 10, 'abuela': 10, 'dos hermanos':11, 'OTROS INQUILINOS': 12, 'hermanas':13, 'madre y hermana': 14, 'madre y hermanos':15, 'Madre y Hermanos':15, 'prima': 16, 'madrina':17, 'sola': 18, 'Mamá y Abuela': 19, 'madre,hermano e hijo':20, 'Madre, Hermano y Sobrina': 21, 'hermano, hermana y mi hijo': 22, 'compañeros de habitacion alquilada':23, 'Padres, hermana y abuelos maternos': 24, 'Madre, Hermana, Abuela': 25, 'abuela': 26, 'Dueños del apartamento donde alquilo la habitacion': 27, 'ambos padres y dos hermanis':28, 'Solo': 29, 'hermano':30, 'dueña del apartamento': 31, 'Madre y hermano': 32} ).astype(float)
+
+#------------------------------------------------------------------------------"Cargafamiliar"
+df.Cargafamiliar = df.Cargafamiliar.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Cargafamiliar'] - ndf6['Cargafamiliar'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Cargafamiliar'].std()  
+ndf6['Outlier'] = abs(ndf6['Cargafamiliar'] - ndf6['Cargafamiliar'].mean()) > 1.96*ndf6['Cargafamiliar'].std()
+
+"""
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Cargafamiliar'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Cargafamiliar'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Ingresomensualdesuresponsableeconomico"
+for x in df['Ingresomensualdesuresponsableeconomico']:
+   if RepresentsFloat(x) == False:
+      z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+      valor = ""
+      for y in z:
+          valor = valor + y
+
+   
+      df.loc[df.Ingresomensualdesuresponsableeconomico == x, 'Ingresomensualdesuresponsableeconomico'] = valor
+
+
+df.Ingresomensualdesuresponsableeconomico = df.Ingresomensualdesuresponsableeconomico.astype(float)
+
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Ingresomensualdesuresponsableeconomico'] - ndf6['Ingresomensualdesuresponsableeconomico'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Ingresomensualdesuresponsableeconomico'].std()  
+ndf6['Outlier'] = abs(ndf6['Ingresomensualdesuresponsableeconomico'] - ndf6['Ingresomensualdesuresponsableeconomico'].mean()) > 1.96*ndf6['Ingresomensualdesuresponsableeconomico'].std()
+
+    
+""" 
+#Grafico los outliers
+idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+out = ndf6['Ingresomensualdesuresponsableeconomico'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+normal = ndf6['Ingresomensualdesuresponsableeconomico'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
+#------------------------------------------------------------------------------"Otrosingresos"
+df['Otrosingresos'].fillna(0, inplace=True)
+for x in df['Otrosingresos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Otrosingresos == x, 'Otrosingresos'] = valor
+        else:
+            
+            df.loc[df.Otrosingresos == x, 'Otrosingresos'] = valor
+           
+         
+df.Otrosingresos = df.Otrosingresos.astype(float)
+
+#------------------------------------------------------------------------------"Totaldeingresos"
+df['Totaldeingresos'] = df.Ingresomensualdesuresponsableeconomico + df.Otrosingresos 
+
+#------------------------------------------------------------------------------"Gastosenviviendadesusresponsableseconomicos"
+df['Gastosenviviendadesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Gastosenviviendadesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Gastosenviviendadesusresponsableseconomicos == x, 'Gastosenviviendadesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Gastosenviviendadesusresponsableseconomicos == x, 'Gastosenviviendadesusresponsableseconomicos'] = valor
+           
+         
+df.Gastosenviviendadesusresponsableseconomicos = df.Gastosenviviendadesusresponsableseconomicos.astype(float)
+
+#------------------------------------------------------------------------------"Gastosenalimentaciondesusresponsableseconomicos"
+df['Gastosenalimentaciondesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Gastosenalimentaciondesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Gastosenalimentaciondesusresponsableseconomicos == x, 'Gastosenalimentaciondesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Gastosenalimentaciondesusresponsableseconomicos == x, 'Gastosenalimentaciondesusresponsableseconomicos'] = valor
+           
+         
+df.Gastosenalimentaciondesusresponsableseconomicos = df.Gastosenalimentaciondesusresponsableseconomicos.astype(float)
+
+#------------------------------------------------------------------------------"Gastosentransportedesusresponsableseconomicos"
+df['Gastosentransportedesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Gastosentransportedesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Gastosentransportedesusresponsableseconomicos == x, 'Gastosentransportedesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Gastosentransportedesusresponsableseconomicos == x, 'Gastosentransportedesusresponsableseconomicos'] = valor
+           
+         
+df.Gastosentransportedesusresponsableseconomicos = df.Gastosentransportedesusresponsableseconomicos.astype(float)
+#------------------------------------------------------------------------------"Gastosmedicosdesusresponsableseconomicos"
+df['Gastosmedicosdesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Gastosmedicosdesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Gastosmedicosdesusresponsableseconomicos == x, 'Gastosmedicosdesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Gastosmedicosdesusresponsableseconomicos == x, 'Gastosmedicosdesusresponsableseconomicos'] = valor
+           
+         
+df.Gastosmedicosdesusresponsableseconomicos = df.Gastosmedicosdesusresponsableseconomicos.astype(float)
+#------------------------------------------------------------------------------"Gastosodontologicosdesusresponsableseconomicos"
+df['Gastosodontologicosdesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Gastosodontologicosdesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Gastosodontologicosdesusresponsableseconomicos == x, 'Gastosodontologicosdesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Gastosodontologicosdesusresponsableseconomicos == x, 'Gastosodontologicosdesusresponsableseconomicos'] = valor
+           
+         
+df.Gastosodontologicosdesusresponsableseconomicos = df.Gastosodontologicosdesusresponsableseconomicos.astype(float)
+#------------------------------------------------------------------------------"Gastoseducativosdesusresponsableseconomicos"
+df['Gastoseducativosdesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Gastoseducativosdesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Gastoseducativosdesusresponsableseconomicos == x, 'Gastoseducativosdesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Gastoseducativosdesusresponsableseconomicos == x, 'Gastoseducativosdesusresponsableseconomicos'] = valor
+           
+         
+df.Gastoseducativosdesusresponsableseconomicos = df.Gastoseducativosdesusresponsableseconomicos.astype(float)
+#------------------------------------------------------------------------------"Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos"
+df['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos == x, 'Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos == x, 'Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'] = valor
+           
+         
+df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos = df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos.astype(float)
+#------------------------------------------------------------------------------"Condominiodesusresponsableseconomicos"
+df['Condominiodesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Condominiodesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Condominiodesusresponsableseconomicos == x, 'Condominiodesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Condominiodesusresponsableseconomicos == x, 'Condominiodesusresponsableseconomicos'] = valor
+           
+         
+df.Condominiodesusresponsableseconomicos = df.Condominiodesusresponsableseconomicos.astype(float)
+#------------------------------------------------------------------------------"Otrosgastosdesusresponsableseconomicos"
+df['Otrosgastosdesusresponsableseconomicos'].fillna(0, inplace=True)
+for x in df['Otrosgastosdesusresponsableseconomicos']:
+    if RepresentsFloat(x) == False:
+        
+        z = re.split('[ \t,a-z]+', x, flags=re.IGNORECASE)
+       
+        valor = ""
+        for y in z:
+            valor = valor + y
+        if RepresentsFloat(valor) == False:
+                
+            valor = "0"
+            df.loc[df.Otrosgastosdesusresponsableseconomicos == x, 'Otrosgastosdesusresponsableseconomicos'] = valor
+        else:
+            
+            df.loc[df.Otrosgastosdesusresponsableseconomicos == x, 'Otrosgastosdesusresponsableseconomicos'] = valor
+           
+         
+df.Otrosgastosdesusresponsableseconomicos = df.Otrosgastosdesusresponsableseconomicos.astype(float)
+
+#------------------------------------------------------------------------------"Totaldeegresosdesusresponsableseconomicos"
+df['Totaldeegresosdesusresponsableseconomicos'] = df.Gastosenviviendadesusresponsableseconomicos + df.Gastosenalimentaciondesusresponsableseconomicos + df.Gastosentransportedesusresponsableseconomicos + df.Gastosmedicosdesusresponsableseconomicos + df.Gastosodontologicosdesusresponsableseconomicos + df.Gastoseducativosdesusresponsableseconomicos + df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos + df.Condominiodesusresponsableseconomicos + df.Otrosgastosdesusresponsableseconomicos
+#------------------------------------------------------------------------------"DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE"
+df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE = df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE.astype(float)
+#------------------------------------------------------------------------------"Sugerenciasyrecomendacionesparamejorarnuestraatencion"
+
 
 
 #------------------------------------------------------------------------------
