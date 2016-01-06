@@ -12,6 +12,8 @@ import os
 import matplotlib.pyplot as plt
 import xray
 import re
+from sklearn.preprocessing import Imputer
+from scipy.stats import mode
 from pandas import Series
 from pandas import DataFrame
 from sklearn import preprocessing
@@ -48,8 +50,79 @@ for row in data_file_object:       # For each row in test.csv
 data_file.close()
 data2_file.close()
 #------------------------------------------------------------------------------
+
 #Defino el DataFrame con todos los datos
 df = pd.read_csv("data2.csv",header=0)
+
+#------------------------------------------------------------------------------ID
+df.ID = df.ID.astype(float)
+#------------------------------------------------------------------------------PeriodoAcademicoarenovar
+df['AnoAcademicoarenovar'] = df['PeriodoAcademicoarenovar']
+df['SemestreAcademicoarenovar'] =  df['PeriodoAcademicoarenovar']
+for x in df['PeriodoAcademicoarenovar']:
+    #print periodo
+    periodo =  re.findall('[a-zA-Z]+|\\d+', x)
+    tam = len(periodo)
+    
+   
+    if tam == 2 or tam == 5:
+        if periodo[1] == "01" or periodo[1] == "1" or  periodo[0] == "pri" or periodo[0] == "Pri" or periodo[0] == "PRI" or periodo[0] == "1" or periodo[0] == "prim":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = "I"
+        if periodo[1] == "02" or periodo[1] == "2" or periodo[1] == "II" or periodo[0] == "seg" or periodo[0] == "Seg" or periodo[0] == "segundo" or periodo[0] == "2" or periodo[0] == "SEG" or periodo[0] == "Segundo" or periodo[0] == "sec":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = "II"
+        if periodo[1] == "2015" or periodo[1] == "15" or periodo[0] == "2015" or periodo[0] == "15":
+            df.loc[df.AnoAcademicoarenovar == x, 'AnoAcademicoarenovar'] = "2015" 
+        if periodo[1] == "2014" or periodo[1] == "14" or periodo[0] == "2014" or periodo[0] == "14":
+            df.loc[df.AnoAcademicoarenovar == x, 'AnoAcademicoarenovar'] = "2014" 
+        if periodo[0] == "I" or periodo[0] == "II":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = periodo[0]
+            
+            
+    if tam == 3:
+        if periodo[2] == "1" or periodo[0] == "pri" or periodo[0] == "Pri" or periodo[0] == "PRI" or periodo[0] == "1" or periodo[0] == "prim" or periodo[1] == "01" or periodo[1] == "1":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = "I"
+        if periodo[2] == "2015" or periodo[2] == "15" or periodo[0] == "2015" or periodo[0] == "15":
+            df.loc[df.AnoAcademicoarenovar == x, 'AnoAcademicoarenovar'] = "2015" 
+        if periodo[2] == "2014" or periodo[2] == "14" or periodo[0] == "2014" or periodo[0] == "14":
+            df.loc[df.AnoAcademicoarenovar == x, 'AnoAcademicoarenovar'] = "2014"
+        if periodo[0] == "I" or periodo[0] == "II":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = periodo[0]
+        if periodo[1] == "02" or periodo[1] == "2" or periodo[1] == "II" or periodo[0] == "seg" or periodo[0] == "Seg" or periodo[0] == "segundo" or periodo[0] == "2" or periodo[0] == "SEG" or periodo[0] == "Segundo" or periodo[0] == "sec":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = "II"
+            
+    if tam == 1:
+        if periodo[0] == "I" or periodo[0] == "II":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = periodo[0]
+            
+        if periodo[0] == "pri" or periodo[0] == "Pri" or periodo[0] == "PRI" or periodo[0] == "1" or periodo[0] == "prim":
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = "I"
+          
+        if periodo[0] == "seg" or periodo[0] == "Seg" or periodo[0] == "segundo" or periodo[0] == "2" or periodo[0] == "SEG" or periodo[0] == "Segundo" or periodo[0] == "sec":  
+            df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = "II"
+            
+        if periodo[0] == "2015" or periodo[0] == "15":
+            df.loc[df.AnoAcademicoarenovar == x, 'AnoAcademicoarenovar'] = "2015" 
+        if periodo[0] == "2014" or periodo[0] == "14":
+            df.loc[df.AnoAcademicoarenovar == x, 'AnoAcademicoarenovar'] = "2014"
+
+
+for x in df.AnoAcademicoarenovar:
+    if x != "2015" and x != "2014":
+         df.loc[df.AnoAcademicoarenovar == x, 'AnoAcademicoarenovar'] = "NaN" 
+         
+for x in df.SemestreAcademicoarenovar:
+    if x != "I" and x != "II":
+         df.loc[df.SemestreAcademicoarenovar == x, 'SemestreAcademicoarenovar'] = "NaN" 
+         
+df['SemestreAcademicoarenovar'] = df['SemestreAcademicoarenovar'].map( {'I': 1, 'II': 2} ) 
+df.AnoAcademicoarenovar = df.AnoAcademicoarenovar.astype(float)
+x = mode(df['AnoAcademicoarenovar'] )
+y = mode(df['SemestreAcademicoarenovar'] )
+
+df['AnoAcademicoarenovar'].fillna(int(x[0]), inplace=True)
+df['SemestreAcademicoarenovar'].fillna(int(y[0]), inplace=True)
+    
+ 
 """
 # All missing Embarked -> just make them embark from most common place
 if len(df.PeriodoAcademicoarenovar[df.PeriodoAcademicoarenovar.isnull() ]) > 0:
@@ -306,7 +379,7 @@ plt.legend((out, rest),
 plt.figure()"""
 
 #------------------------------------------------------------------------------Sireprobounaomasmateriasindiqueelmotivo
-print "ANALIZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR"
+df.Sireprobounaomasmateriasindiqueelmotivo = df.Sireprobounaomasmateriasindiqueelmotivo
 
 #------------------------------------------------------------------------------Numerodemateriasinscritasenelsemestreencurso
 df.Numerodemateriasinscritasenelsemestreencurso = df.Numerodemateriasinscritasenelsemestreencurso.astype(float)
@@ -1064,4 +1137,4 @@ df.Deseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosservicioso
 
 
 #Genero el .cvs a partir del dataframe
-#df.to_csv("minable.csv", sep='\t')
+df.to_csv("minable.csv")
