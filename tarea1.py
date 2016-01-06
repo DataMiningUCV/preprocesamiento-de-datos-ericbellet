@@ -136,6 +136,51 @@ Ports_dict = { name : i for i, name in Ports }              # set up a dictionar
 #CONVIERTO TODA LA COLUMNA CEDULA EN FLOAT
 df.CedulaDeIdentidad = df.CedulaDeIdentidad.astype(float)
 #------------------------------------------------------------------------------FechadeNacimiento
+df['DiadeNacimiento'] = df['FechadeNacimiento']
+df['MesdeNacimiento'] = df['FechadeNacimiento']
+df['AnodeNacimiento'] = df['FechadeNacimiento']
+
+
+for x in df['FechadeNacimiento']:
+    #print periodo
+    fecha =  re.findall('[a-zA-Z]+|\\d+', x)
+    #fecha
+    tam = len(fecha)
+    
+    if tam == 1:
+        string = fecha[0]
+        firstpart, secondpart = string[:len(string)/2], string[len(string)/2:]
+        if int(secondpart) > 1900:
+            df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = secondpart
+            string = firstpart
+            firstpart, secondpart = string[:len(string)/2], string[len(string)/2:]
+            df.loc[df.DiadeNacimiento == x, 'DiadeNacimiento'] = firstpart
+            df.loc[df.MesdeNacimiento == x, 'MesdeNacimiento'] = secondpart
+        
+        
+    if tam == 3:
+        df.loc[df.DiadeNacimiento == x, 'DiadeNacimiento'] = fecha[0]
+        df.loc[df.MesdeNacimiento == x, 'MesdeNacimiento'] = fecha[1]
+        
+        if len(fecha[2]) == 4:
+            df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = fecha[2]
+        
+        if len(fecha[2]) == 2:
+            df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = "19" +fecha[2]
+#Elimino esta fila ya que la fecha esta completamente incorrecta   
+df = df.drop(df.index[19])      
+       
+          
+df.DiadeNacimiento = df.DiadeNacimiento.astype(int)
+          
+df.MesdeNacimiento = df.MesdeNacimiento.astype(int)
+
+df.AnodeNacimiento = df.AnodeNacimiento.astype(int)
+      
+   
+         
+
+
 #------------------------------------------------------------------------------EDAD
 #CONVIERTO TODA LA COLUMNA EDAD EN ENTERO
 #Busco las edades que no se pueden transformar en Entero y las acomodo
@@ -146,7 +191,7 @@ for x in df['Edad']:
 
  
 #Realizo la transformacion en toda la columna.
-df.Edad = df.Edad.astype(float)
+df.Edad = df.Edad.astype(int)
 
 #Hago una copia del dataframe, para hayar los OUTLIERS
 newdf = df.copy()
