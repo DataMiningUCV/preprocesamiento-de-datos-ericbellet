@@ -10,6 +10,7 @@ import csv as csv
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+
 import xray
 import re
 from sklearn.preprocessing import Imputer
@@ -55,7 +56,7 @@ data2_file.close()
 df = pd.read_csv("data2.csv",header=0)
 
 #------------------------------------------------------------------------------ID
-df.ID = df.ID.astype(float)
+df.ID = df.ID.astype(int)
 #------------------------------------------------------------------------------PeriodoAcademicoarenovar
 df['AnoAcademicoarenovar'] = df['PeriodoAcademicoarenovar']
 df['SemestreAcademicoarenovar'] =  df['PeriodoAcademicoarenovar']
@@ -121,17 +122,9 @@ y = mode(df['SemestreAcademicoarenovar'] )
 
 df['AnoAcademicoarenovar'].fillna(int(x[0]), inplace=True)
 df['SemestreAcademicoarenovar'].fillna(int(y[0]), inplace=True)
-    
- 
-"""
-# All missing Embarked -> just make them embark from most common place
-if len(df.PeriodoAcademicoarenovar[df.PeriodoAcademicoarenovar.isnull() ]) > 0:
-    df.PeriodoAcademicoarenovar[ df.PeriodoAcademicoarenovar.isnull() ] = df.PeriodoAcademicoarenovar.dropna().mode().values
 
-Ports = list(enumerate(np.unique(df['PeriodoAcademicoarenovar'])))    # determine all values of Embarked,
-Ports_dict = { name : i for i, name in Ports }              # set up a dictionary in the form  Ports : index
-"""
-#df.PeriodoAcademicoarenovar = df.PeriodoAcademicoarenovar.map( lambda x: Ports_dict[x]).astype(int)     # Convert all Embark strings to int
+df.AnoAcademicoarenovar = df.AnoAcademicoarenovar.astype(int)   
+df.SemestreAcademicoarenovar = df.SemestreAcademicoarenovar.astype(int)  
 #------------------------------------------------------------------------------CEDULA
 #CONVIERTO TODA LA COLUMNA CEDULA EN FLOAT
 df.CedulaDeIdentidad = df.CedulaDeIdentidad.astype(float)
@@ -156,6 +149,10 @@ for x in df['FechadeNacimiento']:
             firstpart, secondpart = string[:len(string)/2], string[len(string)/2:]
             df.loc[df.DiadeNacimiento == x, 'DiadeNacimiento'] = firstpart
             df.loc[df.MesdeNacimiento == x, 'MesdeNacimiento'] = secondpart
+        if string == "19220485":
+            df.loc[df.DiadeNacimiento == x, 'DiadeNacimiento'] = "22"
+            df.loc[df.MesdeNacimiento == x, 'MesdeNacimiento'] = "04"
+            df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = "1985"
         
         
     if tam == 3:
@@ -163,12 +160,17 @@ for x in df['FechadeNacimiento']:
         df.loc[df.MesdeNacimiento == x, 'MesdeNacimiento'] = fecha[1]
         
         if len(fecha[2]) == 4:
-            df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = fecha[2]
+            if int(fecha[2]) > 2000:
+                df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = "1991"
+            else:
+                df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = fecha[2]
+            
+                
         
         if len(fecha[2]) == 2:
             df.loc[df.AnodeNacimiento == x, 'AnodeNacimiento'] = "19" +fecha[2]
 #Elimino esta fila ya que la fecha esta completamente incorrecta   
-df = df.drop(df.index[19])      
+#df = df.drop(df.index[19])      
        
           
 df.DiadeNacimiento = df.DiadeNacimiento.astype(int)
@@ -198,31 +200,43 @@ newdf = df.copy()
 newdf['x-Mean'] = abs(newdf['Edad'] - newdf['Edad'].mean())
 newdf['1.96*std'] = 1.96*newdf['Edad'].std()  
 newdf['Outlier'] = abs(newdf['Edad'] - newdf['Edad'].mean()) > 1.96*newdf['Edad'].std()
-"""
-#Grafico los outliers
+
+# data 
 idout = newdf['ID'][(newdf['Outlier'] == True)]
 edadout = newdf['Edad'][(newdf['Outlier'] == True)]
 idnormal = newdf['ID'][(newdf['Outlier'] == False)]
 edadnormal = newdf['Edad'][(newdf['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('ID')
+plt.ylabel('Edad')
+plt.title('Outliers: Edades de los estudiantes')
 out = plt.scatter(idout, edadout, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, edadnormal, marker='o', color=colors[1], s=100)
+
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Edad.png')
+
+
 #------------------------------------------------------------------------------EstadoCivil
+
 df['EstadoCivil'] = df['EstadoCivil'].map( {'Soltero (a)': 0, 'Casado (a)': 1, 'Viudo (a)': 2, 'Unido (a)':3} ).astype(int)
 
 #------------------------------------------------------------------------------SEXO
 df['Sexo'] = df['Sexo'].map( {'Femenino': 0, 'Masculino': 1} ).astype(int)
+
 #------------------------------------------------------------------------------ESCUELA
 df['Escuela'] = df['Escuela'].map( {'Bioanálisis': 0, 'Enfermería': 1} ).astype(int)
+
 #------------------------------------------------------------------------------AnodeIngresoalaUCV
-df.AnodeIngresoalaUCV = df.AnodeIngresoalaUCV.astype(float)
+df.AnodeIngresoalaUCV = df.AnodeIngresoalaUCV.astype(int)
 #Hago una copia del dataframe, para hayar los OUTLIERS
 ndf = df.copy()
 ndf['x-Mean'] = abs(ndf['AnodeIngresoalaUCV'] - ndf['AnodeIngresoalaUCV'].mean())
@@ -230,31 +244,39 @@ ndf['1.96*std'] = 1.96*ndf['AnodeIngresoalaUCV'].std()
 ndf['Outlier'] = abs(ndf['AnodeIngresoalaUCV'] - ndf['AnodeIngresoalaUCV'].mean()) > 1.96*ndf['AnodeIngresoalaUCV'].std()
 
 
-"""
+
 #Grafico los outliers
 idout = ndf['ID'][(ndf['Outlier'] == True)]
 AnodeIngresoalaUCVout = ndf['AnodeIngresoalaUCV'][(ndf['Outlier'] == True)]
 idnormal = ndf['ID'][(ndf['Outlier'] == False)]
 AnodeIngresoalaUCVnormal = ndf['AnodeIngresoalaUCV'][(ndf['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('ID')
+plt.ylabel('Ano de Ingreso a la UCV')
+plt.title('Outliers: Ano de Ingreso a la UCV de los estudiantes')
 out = plt.scatter(idout, AnodeIngresoalaUCVout, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, AnodeIngresoalaUCVnormal, marker='o', color=colors[1], s=100)
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('AnodeIngresoalaUCV.png')
+
 
 #------------------------------------------------------------------------------ModalidaddeIngresoalaUCV
 df['ModalidaddeIngresoalaUCV'] = df['ModalidaddeIngresoalaUCV'].map( {'Convenios Interinstitucionales (nacionales e internacionales)': 0, 'Prueba Interna y/o propedéutico': 1, 'Convenios Internos (Deportistas, artistas, hijos empleados docente y obreros, Samuel Robinson)': 2, 'Asignado OPSU': 3} ).astype(int)
+
 #------------------------------------------------------------------------------Semestrequecursa
 for x in df['Semestrequecursa']:
    if RepresentsInt(x) == False:
       semestre = re.split('[a-z]+', x, flags=re.IGNORECASE)
       df.loc[df.Semestrequecursa == x, 'Semestrequecursa'] = semestre[0]
-df.Semestrequecursa = df.Semestrequecursa.astype(float)
+df.Semestrequecursa = df.Semestrequecursa.astype(int)
 
 
 ndf1 = df.copy()
@@ -281,50 +303,26 @@ plt.legend((out, rest),
 plt.figure()"""
 #------------------------------------------------------------------------------Hacambiadousteddedireccion
 df['Hacambiadousteddedireccion'] = df['Hacambiadousteddedireccion'].map( {'No': 0, 'Si': 1} ).astype(int)
+#mode(df['Hacambiadousteddedireccion'] )
 #------------------------------------------------------------------------------Deserafirmativoindiqueelmotivo
 df['Deserafirmativoindiqueelmotivo'].fillna('nan', inplace=True)
 
-df['Deserafirmativoindiqueelmotivo'] = df['Deserafirmativoindiqueelmotivo'].map( {'nan': 0,'situacion de salud de un familiar': 1,'Unión a pareja': 2, 'porque mis padres se mudaron': 3,'No me llegan correos de ustedes': 4, 'mudanza': 5,'vivia con mi tia, ahora vivo con mi madre en los valles del tuy': 6, 'olvido de clave': 7,'Por venta de la casa.': 8, 'Enfermedad de mi mamá': 9} ).astype(float)
+df['Deserafirmativoindiqueelmotivo'] = df['Deserafirmativoindiqueelmotivo'].map( {'nan': 0,'situacion de salud de un familiar': 1,'Unión a pareja': 2, 'porque mis padres se mudaron': 2,'No me llegan correos de ustedes': 3, 'mudanza': 2, 'mudanza ': 2,'vivia con mi tia, ahora vivo con mi madre en los valles del tuy': 2, 'olvido de clave': 7,'Por venta de la casa.': 2, 'Enfermedad de mi mamá': 1} ).astype(float)
+df['Deserafirmativoindiqueelmotivo'] = df['Deserafirmativoindiqueelmotivo'].astype(int)
 
-#------------------------------------------------------------------------------Numerodemateriasinscritasenelsemestreoañoanterior
-df.Numerodemateriasinscritasenelsemestreoanoanterior = df.Numerodemateriasinscritasenelsemestreoanoanterior.astype(float)
-
-ndf2 = df.copy()
-ndf2['x-Mean'] = abs(ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].mean())
-ndf2['1.96*std'] = 1.96*ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].std()  
-ndf2['Outlier'] = abs(ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].mean()) > 1.96*ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].std()
-
-"""
-
-#Grafico los outliers
-idout = ndf2['ID'][(ndf2['Outlier'] == True)]
-Numerodemateriasinscritasenelsemestreoanoanteriorout = ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf2['Outlier'] == True)]
-idnormal = ndf2['ID'][(ndf2['Outlier'] == False)]
-Numerodemateriasinscritasenelsemestreoanoanteriornormal = ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf2['Outlier'] == False)]
-colors = ['r', 'b']
-out = plt.scatter(idout, Numerodemateriasinscritasenelsemestreoanoanteriorout, marker='x', color=colors[0], s=100)
-rest = plt.scatter(idnormal, Numerodemateriasinscritasenelsemestreoanoanteriornormal, marker='o', color=colors[1], s=100)
-
-plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
-           scatterpoints=1,
-           loc='lower left',
-           ncol=3,
-           fontsize=8)
-plt.figure()"""
+#respondieron = df.loc[df['Deserafirmativoindiqueelmotivo'] != 0]
+#mode(respondieron['Deserafirmativoindiqueelmotivo'])
 #------------------------------------------------------------------------------Numerodemateriaaprobadasenelsemestreoanoanterior
 for x in df['Numerodemateriaaprobadasenelsemestreoanoanterior']:
    if RepresentsInt(x) == False:
-       all=string.maketrans('','')
-       nodigs=all.translate(all, string.digits)
-       semestre = x.translate(all, nodigs)
-       semestree =str(semestre)
-       df.loc[df.Numerodemateriaaprobadasenelsemestreoanoanterior == x, 'Numerodemateriaaprobadasenelsemestreoanoanterior'] = semestree
+      num = re.split('[a-z]+', x, flags=re.IGNORECASE)
+      num
+      df.loc[df.Numerodemateriaaprobadasenelsemestreoanoanterior == x, 'Numerodemateriaaprobadasenelsemestreoanoanterior'] = num[3]
 
-df.Numerodemateriaaprobadasenelsemestreoanoanterior = df.Numerodemateriaaprobadasenelsemestreoanoanterior.astype(float)
+df.Numerodemateriaaprobadasenelsemestreoanoanterior = df.Numerodemateriaaprobadasenelsemestreoanoanterior.astype(int)
 
 #------------------------------------------------------------------------------Numerodemateriasretiradasenelsemestreoanoanterior
-df.Numerodemateriasretiradasenelsemestreoanoanterior = df.Numerodemateriasretiradasenelsemestreoanoanterior.astype(float)
+df.Numerodemateriasretiradasenelsemestreoanoanterior = df.Numerodemateriasretiradasenelsemestreoanoanterior.astype(int)
 ndf4 = df.copy()
 ndf4['x-Mean'] = abs(ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'] - ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'].mean())
 ndf4['1.96*std'] = 1.96*ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'].std()  
@@ -349,7 +347,7 @@ plt.legend((out, rest),
            fontsize=8)
 plt.figure()"""
 #------------------------------------------------------------------------------Numerodemateriasreprobadasenelsemestreoanoanterior
-df.Numerodemateriasreprobadasenelsemestreoanoanterior = df.Numerodemateriasreprobadasenelsemestreoanoanterior.astype(float)
+df.Numerodemateriasreprobadasenelsemestreoanoanterior = df.Numerodemateriasreprobadasenelsemestreoanoanterior.astype(int)
 
 ndf5 = df.copy()
 ndf5['x-Mean'] = abs(ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'] - ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'].mean())
@@ -375,6 +373,33 @@ plt.legend((out, rest),
            fontsize=8)
 plt.figure()"""
 
+#------------------------------------------------------------------------------Numerodemateriasinscritasenelsemestreoañoanterior
+df.Numerodemateriasinscritasenelsemestreoanoanterior = df.Numerodemateriaaprobadasenelsemestreoanoanterior + df.Numerodemateriasreprobadasenelsemestreoanoanterior + df.Numerodemateriasretiradasenelsemestreoanoanterior
+df.Numerodemateriasinscritasenelsemestreoanoanterior = df.Numerodemateriasinscritasenelsemestreoanoanterior.astype(int)
+
+ndf2 = df.copy()
+ndf2['x-Mean'] = abs(ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].mean())
+ndf2['1.96*std'] = 1.96*ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].std()  
+ndf2['Outlier'] = abs(ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].mean()) > 1.96*ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].std()
+
+"""
+
+#Grafico los outliers
+idout = ndf2['ID'][(ndf2['Outlier'] == True)]
+Numerodemateriasinscritasenelsemestreoanoanteriorout = ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf2['Outlier'] == True)]
+idnormal = ndf2['ID'][(ndf2['Outlier'] == False)]
+Numerodemateriasinscritasenelsemestreoanoanteriornormal = ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf2['Outlier'] == False)]
+colors = ['r', 'b']
+out = plt.scatter(idout, Numerodemateriasinscritasenelsemestreoanoanteriorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, Numerodemateriasinscritasenelsemestreoanoanteriornormal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Normal student'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+plt.figure()"""
 #------------------------------------------------------------------------------Promedioponderadoaprobado
 df.Promedioponderadoaprobado = df.Promedioponderadoaprobado.astype(float)
 for x in df['Promedioponderadoaprobado']:
@@ -387,18 +412,21 @@ for x in df['Promedioponderadoaprobado']:
         
         df.loc[df.Promedioponderadoaprobado == x, 'Promedioponderadoaprobado'] = valor
     
- 
+df['Promedioponderadoaprobado'] = df['Promedioponderadoaprobado'].round(2) 
    
 
 #------------------------------------------------------------------------------Eficiencia
+df['Eficiencia'].round(2)
 for x in df['Eficiencia']:
+    
     if int(x) >1:
         
         valor = "0." + str(int(x))
+        
         df.loc[df.Eficiencia == x, 'Eficiencia'] = valor
 
-
-df.Eficiencia = df.Eficiencia.astype(float)       
+df.Eficiencia = df.Eficiencia.astype(float)
+df['Eficiencia'] = df['Eficiencia'].round(2) 
     
  
 ndf6 = df.copy()
@@ -424,10 +452,16 @@ plt.legend((out, rest),
 plt.figure()"""
 
 #------------------------------------------------------------------------------Sireprobounaomasmateriasindiqueelmotivo
-df.Sireprobounaomasmateriasindiqueelmotivo = df.Sireprobounaomasmateriasindiqueelmotivo
+
+Ports = list(enumerate(np.unique(df['Sireprobounaomasmateriasindiqueelmotivo'])))   
+Ports_dict = { name : i for i, name in Ports }              
+
+df.Sireprobounaomasmateriasindiqueelmotivo = df.Sireprobounaomasmateriasindiqueelmotivo.map( lambda x: Ports_dict[x]).astype(int)    
+
+    
 
 #------------------------------------------------------------------------------Numerodemateriasinscritasenelsemestreencurso
-df.Numerodemateriasinscritasenelsemestreencurso = df.Numerodemateriasinscritasenelsemestreencurso.astype(float)
+df.Numerodemateriasinscritasenelsemestreencurso = df.Numerodemateriasinscritasenelsemestreencurso.astype(int)
 
 ndf6 = df.copy()
 ndf6['x-Mean'] = abs(ndf6['Numerodemateriasinscritasenelsemestreencurso'] - ndf6['Numerodemateriasinscritasenelsemestreencurso'].mean())
@@ -457,10 +491,10 @@ df['Seencuentrarealizandotesisopasantiasdegrado'] = df['Seencuentrarealizandotes
 
 df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'].fillna(0, inplace=True)
 df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'] = df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'].map( {0:0,'Primera vez': 1, 'Segunda vez': 2, 'Más de dos': 3} ).astype(float)
-
+df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'] = df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'].astype(int)
 #------------------------------------------------------------------------------Procedencia
 df['Procedencia'] = df['Procedencia'].map( {'Municipio Sucre':0,'Guarenas - Guatire': 1, 'Municipio Libertador Caracas': 2, 'Aragua': 3,'Municipio Baruta': 4, 'Valles del Tuy': 5, 'Altos Mirandinos': 6,'Apure': 7, 'Municipio El Hatillo': 8, 'Municipio Chacao': 9,'Táchira': 10, 'Vargas':11, 'Monagas': 12, 'Portuguesa':13, 'Nueva Esparta': 14, 'Trujillo':15, 'Bolívar': 16, 'Barinas':17, 'Sucre': 18, 'Barlovento': 19, 'Anzoategui':20, 'Mérida': 21, 'Delta Amacuro': 22, 'Lara':23, 'Yaracuy': 24, 'Guárico': 25} ).astype(float)
-
+df['Procedencia'] = df['Procedencia'].astype(int)
 #------------------------------------------------------------------------------"LugardonderesidemientrasestudiaenlaUniversidad"
 #SUstituyo los valores nulos por su procedencia
 df['LugardonderesidemientrasestudiaenlaUniversidad'].fillna(0, inplace=True)
@@ -469,22 +503,36 @@ contador=0
 
 for x in df['LugardonderesidemientrasestudiaenlaUniversidad']:
     if x == 26:
-        valor = df['Procedencia'][contador]
-        df.loc[df.LugardonderesidemientrasestudiaenlaUniversidad == x, 'LugardonderesidemientrasestudiaenlaUniversidad'] = valor
+        valor = df['Procedencia'][contador]    
+        df['LugardonderesidemientrasestudiaenlaUniversidad'][contador] = valor
         
     contador=contador+1
     
-   
+df['LugardonderesidemientrasestudiaenlaUniversidad'] = df['LugardonderesidemientrasestudiaenlaUniversidad'].astype(int)   
 #------------------------------------------------------------------------------"Personasconlascualesustedvivemientrasestudiaenlauniversidad"
-df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] = df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].map( {'residencia estudiantil':0, 'recidencia':0, 'residencia':0,'Residencia':0,'Esposo (a) Hijos (as) ': 1, 'Familiares paternos': 2, 'Madre': 3,'Familiares maternos': 4, 'Ambos padres': 5, 'Mi Mamá y mi hijo ': 6,'Padre': 7, 'Amigos': 8, 'madre y su esposo,abuela,y mi esposo': 9,'hermana': 10, 'Hermana': 10, 'dos hermanos':11, 'OTROS INQUILINOS': 12, 'hermanas':13, 'madre y hermana': 14, 'madre y hermanos':15, 'Madre y Hermanos':15, 'prima': 16, 'madrina':17, 'sola': 18, 'Mamá y Abuela': 19, 'madre,hermano e hijo':20, 'Madre, Hermano y Sobrina': 21, 'hermano, hermana y mi hijo': 22, 'compañeros de habitacion alquilada':23, 'Padres, hermana y abuelos maternos': 24, 'Madre, Hermana, Abuela': 25, 'abuela': 26, 'Dueños del apartamento donde alquilo la habitacion': 27, 'ambos padres y dos hermanis':28, 'Solo': 29, 'hermano':30, 'dueña del apartamento': 31, 'Madre y hermano': 32} ).astype(float)
-
+df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] = df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].map( {'residencia estudiantil':0, 'recidencia':0, 'residencia':0,'Residencia':0,'Esposo (a) Hijos (as) ': 1,'Esposo (a) Hijos (as)\xc2\xa0': 1, 'Familiares paternos': 2, 'Madre': 3,'Familiares maternos': 4, 'Ambos padres': 5, 'Mi Mamá y mi hijo ': 6,'Padre': 7, 'Amigos': 8, 'madre y su esposo,abuela,y mi esposo': 9,'hermana': 10, 'Hermana': 10, 'dos hermanos':11, 'OTROS INQUILINOS': 12, 'hermanas':13, 'madre y hermana': 14, 'madre y hermanos':15, 'Madre y Hermanos':15, 'prima': 16, 'madrina':17, 'sola': 18, 'Mamá y Abuela': 19, 'madre,hermano e hijo':20, 'Madre, Hermano y Sobrina': 21, 'hermano, hermana y mi hijo': 22, 'compañeros de habitacion alquilada':23, 'Padres, hermana y abuelos maternos': 24, 'Madre, Hermana, Abuela': 25, 'abuela': 26, 'Dueños del apartamento donde alquilo la habitacion': 27, 'ambos padres y dos hermanis':28, 'Solo': 29, 'hermano':30, 'dueña del apartamento': 31, 'Madre y hermano': 32} ).astype(float)
+df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] = df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].astype(int) 
 #------------------------------------------------------------------------------"Tipodeviviendadonderesidemientrasestudiaenlauniversidad"
 df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'] = df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].map( {'Quinta o casa quinta':0, 'Apartamento en edifico': 1, 'Casa en barrio urbano': 2, 'Habitación alquilada': 3,'Casa de vecindad': 4, 'Residencia estudiantil': 5, 'Apartamento en quinta - casa quinta o casa': 6,'conserjería ': 7, 'Casa en barrio rural': 8, 'Casa de vecindad': 9,'casa': 10} ).astype(float)
-
+df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'] = df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].astype(int) 
 #------------------------------------------------------------------------------ "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual"
-print "ANALIZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR"
+#Los que tienen 0 significa que no viven en alquiler o residencia estudiantil o no respondieron
+df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].fillna(0, inplace=True)
+for x in df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual']:
+    if x == "1 UT":
+        df.loc[df.Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual == x, 'Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] = "125"
+
+    if RepresentsInt(x) == False:
+        precio = re.split('[a-z]+', x, flags=re.IGNORECASE)
+        df.loc[df.Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual == x, 'Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] = precio[0]
+df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] = df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].astype(float)
 #------------------------------------------------------------------------------ "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada"
-print "ANALIZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR"
+
+Ports = list(enumerate(np.unique(df['Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada'])))   
+Ports_dict = { name : i for i, name in Ports }              
+
+df.Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada = df.Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada.map( lambda x: Ports_dict[x]).astype(int)    
+
 #------------------------------------------------------------------------------"Contrajomatrimonio"
 df['Contrajomatrimonio'] = df['Contrajomatrimonio'].map( {'No': 0, 'Si': 1} ).astype(int)
 
@@ -494,14 +542,14 @@ df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion'] = df['Hasolic
 #------------------------------------------------------------------------------"Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo"
 df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].fillna(0, inplace=True)
 df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'] = df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].map( {0:0,'2012, OBE. AYUDA ECONÓMICA. SOLVENTAR GASTOS DE ESTUDIOS Y TRANSPORTE.':13, 'OBE 2011 UCV . Motivo: ayuda económica para mis estudios ': 1, 'AÑO 2011 AYUDA ECONÓMICA POR OBE PARA CUBRIR GASTOS  DE MATERIAL DE ESTUDIO.': 2, 'Beca ayudantía en el año 2011 Universidad Central de Venezuela (OBE) apoyo económico para material de estudio': 3,'solicitud en 2013. \nayuda economica \n': 4, 'Año solicitud 2013\nInstitución: Universidad Central de Venezuela (OBE)\nMotivo: Transporte, Materiales Estudios, Comida': 5, 'fames ayuda para maternidad': 6,'2015, ucv, falta de ingresos, ayuda economica': 7, 'Año: 2013. Institucion: OBE. Motivo: ayuda económica para rehabilitación (fisioterapia), ya que me atropello una moto.': 8, 'Año:2014 \nInstitucion: OBE\nMotivo: Compra de materiales de estudio. ': 9,'fecha:2014\ninstituto:OBE\ncompras de material de estudio': 10,'solicitud 2015 en el instituto OBE , motivo ayuda economica para gastos de la universidad (libro, pasaje, equipo de enfermeria, etc)': 11,'año 2014, OBE, solicitada para cubrir parte de los gastos mensuales estudiantiles': 12} ).astype(float)
-
+df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'] = df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].astype(int)
 #------------------------------------------------------------------------------ "Seencuentraustedrealizandoalgunaactividadquelegenereingresos"
 df['Seencuentraustedrealizandoalgunaactividadquelegenereingresos'] = df['Seencuentraustedrealizandoalgunaactividadquelegenereingresos'].map( {'No': 0, 'Si': 1} ).astype(int)
 
 #------------------------------------------------------------------------------"Encasodeserafirmativoindiquetipodeactividadysufrecuencia"
 df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].fillna(0, inplace=True)
 df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'] = df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].map( {0:0,'cuido pacientes parapoder obtener un ingreso economico': 1, 'STAFF DE EMPRESA DEPORTAIVA. UNO O DOS FINES DE SEMANA AL MES APROXIMADAMENTE.': 2, 'Recreación, algunos fines de semana (poco frecuente por falta de tiempo).': 3,'Secretaria, sólo los sábados medio turno.': 4} ).astype(float)
-
+df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'] = df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].astype(int)
 
 #------------------------------------------------------------------------------"Montomensualdelabeca"
 df.Montomensualdelabeca = df.Montomensualdelabeca.astype(float)
@@ -879,9 +927,9 @@ plt.legend((out, rest),
 plt.figure()"""
 #------------------------------------------------------------------------------"Indiquequienessuresponsableeconomico"
 df['Indiquequienessuresponsableeconomico'] = df['Indiquequienessuresponsableeconomico'].map( {'Usted mismo':0,'esposo': 1, 'ninguno': 2, 'Madre': 3,'Familiares': 4, 'Padre': 5, 'Ambos padres': 6,'Cónyugue': 7, 'tia': 8, 'Hermano': 9,'hermana': 10,'MI HERMANA': 10, 'abuela': 10, 'dos hermanos':11, 'OTROS INQUILINOS': 12, 'hermanas':13, 'madre y hermana': 14, 'madre y hermanos':15, 'Madre y Hermanos':15, 'prima': 16, 'madrina':17, 'sola': 18, 'Mamá y Abuela': 19, 'madre,hermano e hijo':20, 'Madre, Hermano y Sobrina': 21, 'hermano, hermana y mi hijo': 22, 'compañeros de habitacion alquilada':23, 'Padres, hermana y abuelos maternos': 24, 'Madre, Hermana, Abuela': 25, 'abuela': 26, 'Dueños del apartamento donde alquilo la habitacion': 27, 'ambos padres y dos hermanis':28, 'Solo': 29, 'hermano':30, 'dueña del apartamento': 31, 'Madre y hermano': 32} ).astype(float)
-
+df['Indiquequienessuresponsableeconomico'] = df['Indiquequienessuresponsableeconomico'].astype(int)
 #------------------------------------------------------------------------------"Cargafamiliar"
-df.Cargafamiliar = df.Cargafamiliar.astype(float)
+df.Cargafamiliar = df.Cargafamiliar.astype(int)
 
 ndf6 = df.copy()
 ndf6['x-Mean'] = abs(ndf6['Cargafamiliar'] - ndf6['Cargafamiliar'].mean())
@@ -1153,33 +1201,18 @@ df.Otrosgastosdesusresponsableseconomicos = df.Otrosgastosdesusresponsablesecono
 #------------------------------------------------------------------------------"Totaldeegresosdesusresponsableseconomicos"
 df['Totaldeegresosdesusresponsableseconomicos'] = df.Gastosenviviendadesusresponsableseconomicos + df.Gastosenalimentaciondesusresponsableseconomicos + df.Gastosentransportedesusresponsableseconomicos + df.Gastosmedicosdesusresponsableseconomicos + df.Gastosodontologicosdesusresponsableseconomicos + df.Gastoseducativosdesusresponsableseconomicos + df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos + df.Condominiodesusresponsableseconomicos + df.Otrosgastosdesusresponsableseconomicos
 #------------------------------------------------------------------------------"DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE"
-df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE = df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE.astype(float)
+df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE = df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE.astype(int)
 #------------------------------------------------------------------------------"Sugerenciasyrecomendacionesparamejorarnuestraatencion"
 
+Ports = list(enumerate(np.unique(df['Sugerenciasyrecomendacionesparamejorarnuestraatencion'])))   
+Ports_dict = { name : i for i, name in Ports }              
 
-
+df.Sugerenciasyrecomendacionesparamejorarnuestraatencion = df.Sugerenciasyrecomendacionesparamejorarnuestraatencion.map( lambda x: Ports_dict[x]).astype(int)    
 #------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-
-
+cols = ["ID", "SemestreAcademicoarenovar", "AnoAcademicoarenovar", "CedulaDeIdentidad", "DiadeNacimiento", "MesdeNacimiento", "AnodeNacimiento", "Edad", "EstadoCivil", "Sexo", "Escuela", "AnodeIngresoalaUCV", "ModalidaddeIngresoalaUCV", "Semestrequecursa", "Hacambiadousteddedireccion", "Deserafirmativoindiqueelmotivo", "Numerodemateriasinscritasenelsemestreoanoanterior", "Numerodemateriaaprobadasenelsemestreoanoanterior", "Numerodemateriasretiradasenelsemestreoanoanterior", "Numerodemateriasreprobadasenelsemestreoanoanterior", "Promedioponderadoaprobado", "Eficiencia", "Sireprobounaomasmateriasindiqueelmotivo", "Numerodemateriasinscritasenelsemestreencurso", "Seencuentrarealizandotesisopasantiasdegrado", "Cantidaddevecesqueharealizadotesisopasantiasdegrado", "Procedencia", "LugardonderesidemientrasestudiaenlaUniversidad", "Personasconlascualesustedvivemientrasestudiaenlauniversidad", "Tipodeviviendadonderesidemientrasestudiaenlauniversidad", "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual", "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada", "Contrajomatrimonio", "HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion", "Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo", "Seencuentraustedrealizandoalgunaactividadquelegenereingresos", "Encasodeserafirmativoindiquetipodeactividadysufrecuencia", "Montomensualdelabeca",  "Aportemensualquelebrindasuresponsableeconomico", "Aportemensualquerecibedefamiliaresoamigos", "Ingresomensualquerecibeporactividadesadestajooporhoras", "Ingresomensualtotal", "Gastosenalimentacionpersonal", "Gastosentransportepersonal", "Gastosmedicospersonal", "Gastosodontologicospersonal", "Gastospersonales", "Gastosenresidenciaohabitacionalquiladapersonal", "GastosenMaterialesdeestudiopersonal", "Gastosenrecreacionpersonal", "Otrosgastospersonal", "Totalegresospersonal", "Indiquequienessuresponsableeconomico", "Cargafamiliar", "Ingresomensualdesuresponsableeconomico", "Otrosingresos", "Totaldeingresos", "Gastosenviviendadesusresponsableseconomicos", "Gastosenalimentaciondesusresponsableseconomicos",  "Gastosentransportedesusresponsableseconomicos", "Gastosmedicosdesusresponsableseconomicos", "Gastosodontologicosdesusresponsableseconomicos", "Gastoseducativosdesusresponsableseconomicos", "Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos", "Condominiodesusresponsableseconomicos", "Otrosgastosdesusresponsableseconomicos", "Totaldeegresosdesusresponsableseconomicos", "DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE", "Sugerenciasyrecomendacionesparamejorarnuestraatencion"]
+df = df[cols]
+df = df.sort_values(by='ID', ascending= True)
+df.describe()
+#df.head()
 #Genero el .cvs a partir del dataframe
 df.to_csv("minable.csv")
