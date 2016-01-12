@@ -1,6 +1,60 @@
-# preprocesamiento-de-datos-ericbellet
-# preprocesamiento-de-datos-ericbellet
+Preprocesamiento de datos Eric Bellet
 
-sudo apt-get install python-pip
-sudo pip install numpy
-sudo pip install pandas
+
+
+# [Bootstrap](http://getbootstrap.com)
+
+[![Slack](https://bootstrap-slack.herokuapp.com/badge.svg)](https://bootstrap-slack.herokuapp.com)
+![Bower version](https://img.shields.io/bower/v/bootstrap.svg)
+[![npm version](https://img.shields.io/npm/v/bootstrap.svg)](https://www.npmjs.com/package/bootstrap)
+[![Build Status](https://img.shields.io/travis/twbs/bootstrap/master.svg)](https://travis-ci.org/twbs/bootstrap)
+[![devDependency Status](https://img.shields.io/david/dev/twbs/bootstrap.svg)](https://david-dm.org/twbs/bootstrap#info=devDependencies)
+[![NuGet](https://img.shields.io/nuget/v/bootstrap.svg)](https://www.nuget.org/packages/Bootstrap)
+[![Selenium Test Status](https://saucelabs.com/browser-matrix/bootstrap.svg)](https://saucelabs.com/u/bootstrap)
+
+Bootstrap is a sleek, intuitive, and powerful front-end framework for faster and easier web development, created by [Mark Otto](https://twitter.com/mdo) and [Jacob Thornton](https://twitter.com/fat), and maintained by the [core team](https://github.com/orgs/twbs/people) with the massive support and involvement of the community.
+
+To get started, check out <http://getbootstrap.com>!
+
+
+## Table of contents
+
+* [Quick start](#quick-start)
+* [Bugs and feature requests](#bugs-and-feature-requests)
+* [Documentation](#documentation)
+* [Contributing](#contributing)
+* [Community](#community)
+* [Versioning](#versioning)
+* [Creators](#creators)
+* [Copyright and license](#copyright-and-license)
+
+
+## Quick start
+
+
+* sudo apt-get install python-pip
+* sudo pip install numpy
+* sudo pip install pandas
+* sudo apt-get install python-matplotlib
+
+
+### Qué se encuentra incluido?
+
+Está incluido el script tarea1.py que es el código que transforma el data.csv en minable.csv.
+Está incluido una carpeta llamada Outliers, que contiene un conjunto de imágenes que señalan todos los valores anómalos del set de datos.
+Está incluido el informe.pdf donde se explica que se hizo con el data.csv para obtener el minable.csv.
+Está incluido el explicacion.pdf donde se explica al usario la vista minable.
+
+## Versiones
+
+Se encuentran un conjunto de versiones donde se puede observar los distintos avances en el desarrollo de este proyecto.
+
+
+
+## Creators
+
+**Eric Bellet**
+
+
+
+**Cédula: 24.463.483.**
