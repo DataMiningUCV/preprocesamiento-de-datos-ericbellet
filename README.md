@@ -2,13 +2,11 @@
 # [Preprocesamiento de datos Eric Bellet](https://github.com/DataMiningUCV/preprocesamiento-de-datos-ericbellet)
 
 
-
 ## Tabla de contenido
 
 * [Quick start](#quick-start)
-* [Qué se encuentra incluido?](#bugs-and-feature-requests)
-* [Documentation](#documentation)
-* [Versiones](#community)
+* [Qué se encuentra incluido?](#qué-se-encuentra-incluido?)
+* [Versiones](#versiones)
 * [Creators](#creators)
 
 
