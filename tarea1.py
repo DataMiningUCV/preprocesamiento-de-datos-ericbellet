@@ -117,6 +117,13 @@ for x in df.SemestreAcademicoarenovar:
          
 df['SemestreAcademicoarenovar'] = df['SemestreAcademicoarenovar'].map( {'I': 1, 'II': 2} ) 
 df.AnoAcademicoarenovar = df.AnoAcademicoarenovar.astype(float)
+
+pe2014 = df.loc[df['AnoAcademicoarenovar'] == 2014]
+mode(pe2014['SemestreAcademicoarenovar'])
+
+pe2015 = df.loc[df['AnoAcademicoarenovar'] == 2015]
+mode(pe2015['SemestreAcademicoarenovar'])
+
 x = mode(df['AnoAcademicoarenovar'] )
 y = mode(df['SemestreAcademicoarenovar'] )
 
@@ -127,7 +134,7 @@ df.AnoAcademicoarenovar = df.AnoAcademicoarenovar.astype(int)
 df.SemestreAcademicoarenovar = df.SemestreAcademicoarenovar.astype(int)  
 #------------------------------------------------------------------------------CEDULA
 #CONVIERTO TODA LA COLUMNA CEDULA EN FLOAT
-df.CedulaDeIdentidad = df.CedulaDeIdentidad.astype(float)
+df.CedulaDeIdentidad = df.CedulaDeIdentidad.astype(int)
 #------------------------------------------------------------------------------FechadeNacimiento
 df['DiadeNacimiento'] = df['FechadeNacimiento']
 df['MesdeNacimiento'] = df['FechadeNacimiento']
@@ -179,7 +186,34 @@ df.MesdeNacimiento = df.MesdeNacimiento.astype(int)
 
 df.AnodeNacimiento = df.AnodeNacimiento.astype(int)
       
-   
+#Hago una copia del dataframe, para hayar los OUTLIERS
+newdf = df.copy()
+newdf['x-Mean'] = abs(newdf['AnodeNacimiento'] - newdf['AnodeNacimiento'].mean())
+newdf['1.96*std'] = 1.96*newdf['AnodeNacimiento'].std()  
+newdf['Outlier'] = abs(newdf['AnodeNacimiento'] - newdf['AnodeNacimiento'].mean()) > 1.96*newdf['AnodeNacimiento'].std()
+
+# data 
+idout = newdf['CedulaDeIdentidad'][(newdf['Outlier'] == True)]
+out = newdf['AnodeNacimiento'][(newdf['Outlier'] == True)]
+idnormal = newdf['CedulaDeIdentidad'][(newdf['Outlier'] == False)]
+normal = newdf['AnodeNacimiento'][(newdf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Ano de nacimiento')
+plt.title('Outliers: Ano de nacimiento de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('AnoDeNacimiento.png')
          
 
 
@@ -202,13 +236,13 @@ newdf['1.96*std'] = 1.96*newdf['Edad'].std()
 newdf['Outlier'] = abs(newdf['Edad'] - newdf['Edad'].mean()) > 1.96*newdf['Edad'].std()
 
 # data 
-idout = newdf['ID'][(newdf['Outlier'] == True)]
+idout = newdf['CedulaDeIdentidad'][(newdf['Outlier'] == True)]
 edadout = newdf['Edad'][(newdf['Outlier'] == True)]
-idnormal = newdf['ID'][(newdf['Outlier'] == False)]
+idnormal = newdf['CedulaDeIdentidad'][(newdf['Outlier'] == False)]
 edadnormal = newdf['Edad'][(newdf['Outlier'] == False)]
 colors = ['r', 'b']
 plt.figure()
-plt.xlabel('ID')
+plt.xlabel('Cedula del estudiante')
 plt.ylabel('Edad')
 plt.title('Outliers: Edades de los estudiantes')
 out = plt.scatter(idout, edadout, marker='x', color=colors[0], s=100)
@@ -229,6 +263,34 @@ plt.savefig('Edad.png')
 
 df['EstadoCivil'] = df['EstadoCivil'].map( {'Soltero (a)': 0, 'Casado (a)': 1, 'Viudo (a)': 2, 'Unido (a)':3} ).astype(int)
 
+
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['EstadoCivil'] - ndf['EstadoCivil'].mean())
+ndf['1.96*std'] = 1.96*ndf['EstadoCivil'].std()  
+ndf['Outlier'] = abs(ndf['EstadoCivil'] - ndf['EstadoCivil'].mean()) > 1.96*ndf['EstadoCivil'].std()
+
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['EstadoCivil'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['EstadoCivil'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Estado civil del estudiante')
+plt.title('Outliers: Estado civil de los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('EstadoCivil.png')
 #------------------------------------------------------------------------------SEXO
 df['Sexo'] = df['Sexo'].map( {'Femenino': 0, 'Masculino': 1} ).astype(int)
 
@@ -246,13 +308,13 @@ ndf['Outlier'] = abs(ndf['AnodeIngresoalaUCV'] - ndf['AnodeIngresoalaUCV'].mean(
 
 
 #Grafico los outliers
-idout = ndf['ID'][(ndf['Outlier'] == True)]
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
 AnodeIngresoalaUCVout = ndf['AnodeIngresoalaUCV'][(ndf['Outlier'] == True)]
-idnormal = ndf['ID'][(ndf['Outlier'] == False)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
 AnodeIngresoalaUCVnormal = ndf['AnodeIngresoalaUCV'][(ndf['Outlier'] == False)]
 colors = ['r', 'b']
 plt.figure()
-plt.xlabel('ID')
+plt.xlabel('Cedula del estudiante')
 plt.ylabel('Ano de Ingreso a la UCV')
 plt.title('Outliers: Ano de Ingreso a la UCV de los estudiantes')
 out = plt.scatter(idout, AnodeIngresoalaUCVout, marker='x', color=colors[0], s=100)
@@ -279,39 +341,85 @@ for x in df['Semestrequecursa']:
 df.Semestrequecursa = df.Semestrequecursa.astype(int)
 
 
-ndf1 = df.copy()
-ndf1['x-Mean'] = abs(ndf1['Semestrequecursa'] - ndf1['Semestrequecursa'].mean())
-ndf1['1.96*std'] = 1.96*ndf1['Semestrequecursa'].std()  
-ndf1['Outlier'] = abs(ndf1['Semestrequecursa'] - ndf1['Semestrequecursa'].mean()) > 1.96*ndf1['Semestrequecursa'].std()
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Semestrequecursa'] - ndf['Semestrequecursa'].mean())
+ndf['1.96*std'] = 1.96*ndf['Semestrequecursa'].std()  
+ndf['Outlier'] = abs(ndf['Semestrequecursa'] - ndf['Semestrequecursa'].mean()) > 1.96*ndf['Semestrequecursa'].std()
 
-"""
+
 #Grafico los outliers
-idout = ndf1['ID'][(ndf1['Outlier'] == True)]
-Semestrequecursaout = ndf1['Semestrequecursa'][(ndf1['Outlier'] == True)]
-idnormal = ndf1['ID'][(ndf1['Outlier'] == False)]
-Semestrequecursanormal = ndf1['Semestrequecursa'][(ndf1['Outlier'] == False)]
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Semestrequecursa'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Semestrequecursa'][(ndf['Outlier'] == False)]
 colors = ['r', 'b']
-out = plt.scatter(idout, Semestrequecursaout, marker='x', color=colors[0], s=100)
-rest = plt.scatter(idnormal, Semestrequecursanormal, marker='o', color=colors[1], s=100)
-
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Semestre que cursa el estudiante')
+plt.title('Outliers: Semestre que cursan los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Semestrequecursa.png')
+
 #------------------------------------------------------------------------------Hacambiadousteddedireccion
 df['Hacambiadousteddedireccion'] = df['Hacambiadousteddedireccion'].map( {'No': 0, 'Si': 1} ).astype(int)
 #mode(df['Hacambiadousteddedireccion'] )
 #------------------------------------------------------------------------------Deserafirmativoindiqueelmotivo
 df['Deserafirmativoindiqueelmotivo'].fillna('nan', inplace=True)
 
-df['Deserafirmativoindiqueelmotivo'] = df['Deserafirmativoindiqueelmotivo'].map( {'nan': 0,'situacion de salud de un familiar': 1,'Unión a pareja': 2, 'porque mis padres se mudaron': 2,'No me llegan correos de ustedes': 3, 'mudanza': 2, 'mudanza ': 2,'vivia con mi tia, ahora vivo con mi madre en los valles del tuy': 2, 'olvido de clave': 7,'Por venta de la casa.': 2, 'Enfermedad de mi mamá': 1} ).astype(float)
+df['Deserafirmativoindiqueelmotivo'] = df['Deserafirmativoindiqueelmotivo'].map( {'nan': 0,'situacion de salud de un familiar': 1,'Unión a pareja': 2, 'porque mis padres se mudaron': 2,'No me llegan correos de ustedes': 3, 'mudanza': 2, 'mudanza ': 2,'vivia con mi tia, ahora vivo con mi madre en los valles del tuy': 2, 'olvido de clave': 4,'Por venta de la casa.': 2, 'Enfermedad de mi mamá': 1} ).astype(float)
 df['Deserafirmativoindiqueelmotivo'] = df['Deserafirmativoindiqueelmotivo'].astype(int)
 
 #respondieron = df.loc[df['Deserafirmativoindiqueelmotivo'] != 0]
 #mode(respondieron['Deserafirmativoindiqueelmotivo'])
+df['HacambiadousteddedireccionyMotivo'] = df['Hacambiadousteddedireccion']
+#UNIFICACION
+contador = 0
+for x in df['HacambiadousteddedireccionyMotivo']:
+     if x == 1:
+         
+         df['HacambiadousteddedireccionyMotivo'][contador] = df['Deserafirmativoindiqueelmotivo'][contador]
+     contador= contador + 1
+
+
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['HacambiadousteddedireccionyMotivo'] - ndf['HacambiadousteddedireccionyMotivo'].mean())
+ndf['1.96*std'] = 1.96*ndf['HacambiadousteddedireccionyMotivo'].std()  
+ndf['Outlier'] = abs(ndf['HacambiadousteddedireccionyMotivo'] - ndf['HacambiadousteddedireccionyMotivo'].mean()) > 1.96*ndf['HacambiadousteddedireccionyMotivo'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['HacambiadousteddedireccionyMotivo'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['HacambiadousteddedireccionyMotivo'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Ha cambiado de direccion el estudiante y el motivo')
+plt.title('Outliers: Ha cambiado de direccion de los estudiantes y el motivo')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('HacambiadousteddedireccionyMotivo.png')
+   
+        
+    
+
 #------------------------------------------------------------------------------Numerodemateriaaprobadasenelsemestreoanoanterior
 for x in df['Numerodemateriaaprobadasenelsemestreoanoanterior']:
    if RepresentsInt(x) == False:
@@ -321,85 +429,122 @@ for x in df['Numerodemateriaaprobadasenelsemestreoanoanterior']:
 
 df.Numerodemateriaaprobadasenelsemestreoanoanterior = df.Numerodemateriaaprobadasenelsemestreoanoanterior.astype(int)
 
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'] - ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'].mean())
+ndf['1.96*std'] = 1.96*ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'].std()  
+ndf['Outlier'] = abs(ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'] - ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'].mean()) > 1.96*ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Numerodemateriaaprobadasenelsemestreoanoanterior'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Numero de materias aprobadas en el semestre o ano anterior por el estudiante')
+plt.title('Outliers: Numero de materias aprobadas en el semestre o ano anterior por los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Numerodemateriaaprobadasenelsemestreoanoanterior.png')
+
+
 #------------------------------------------------------------------------------Numerodemateriasretiradasenelsemestreoanoanterior
 df.Numerodemateriasretiradasenelsemestreoanoanterior = df.Numerodemateriasretiradasenelsemestreoanoanterior.astype(int)
-ndf4 = df.copy()
-ndf4['x-Mean'] = abs(ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'] - ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'].mean())
-ndf4['1.96*std'] = 1.96*ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'].std()  
-ndf4['Outlier'] = abs(ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'] - ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'].mean()) > 1.96*ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'].std()
 
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Numerodemateriasretiradasenelsemestreoanoanterior'] - ndf['Numerodemateriasretiradasenelsemestreoanoanterior'].mean())
+ndf['1.96*std'] = 1.96*ndf['Numerodemateriasretiradasenelsemestreoanoanterior'].std()  
+ndf['Outlier'] = abs(ndf['Numerodemateriasretiradasenelsemestreoanoanterior'] - ndf['Numerodemateriasretiradasenelsemestreoanoanterior'].mean()) > 1.96*ndf['Numerodemateriasretiradasenelsemestreoanoanterior'].std()
 
-"""
 #Grafico los outliers
-idout = ndf4['ID'][(ndf4['Outlier'] == True)]
-Numerodemateriasretiradasenelsemestreoanoanteriorout = ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'][(ndf4['Outlier'] == True)]
-idnormal = ndf4['ID'][(ndf4['Outlier'] == False)]
-Numerodemateriasretiradasenelsemestreoanoanteriornormal = ndf4['Numerodemateriasretiradasenelsemestreoanoanterior'][(ndf4['Outlier'] == False)]
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Numerodemateriasretiradasenelsemestreoanoanterior'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Numerodemateriasretiradasenelsemestreoanoanterior'][(ndf['Outlier'] == False)]
 colors = ['r', 'b']
-out = plt.scatter(idout, Numerodemateriasretiradasenelsemestreoanoanteriorout, marker='x', color=colors[0], s=100)
-rest = plt.scatter(idnormal, Numerodemateriasretiradasenelsemestreoanoanteriornormal, marker='o', color=colors[1], s=100)
-
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Numero de materias retiradas en el semestre o ano anterior por el estudiante')
+plt.title('Outliers: Numero de materias retiradas en el semestre o ano anterior por los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Numerodemateriasretiradasenelsemestreoanoanterior.png')
 #------------------------------------------------------------------------------Numerodemateriasreprobadasenelsemestreoanoanterior
 df.Numerodemateriasreprobadasenelsemestreoanoanterior = df.Numerodemateriasreprobadasenelsemestreoanoanterior.astype(int)
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'] - ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'].mean())
+ndf['1.96*std'] = 1.96*ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'].std()  
+ndf['Outlier'] = abs(ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'] - ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'].mean()) > 1.96*ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'].std()
 
-ndf5 = df.copy()
-ndf5['x-Mean'] = abs(ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'] - ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'].mean())
-ndf5['1.96*std'] = 1.96*ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'].std()  
-ndf5['Outlier'] = abs(ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'] - ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'].mean()) > 1.96*ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'].std()
-
-
-"""
 #Grafico los outliers
-idout = ndf5['ID'][(ndf5['Outlier'] == True)]
-Numerodemateriasreprobadasenelsemestreoanoanteriorout = ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'][(ndf5['Outlier'] == True)]
-idnormal = ndf5['ID'][(ndf5['Outlier'] == False)]
-Numerodemateriasreprobadasenelsemestreoanoanteriornormal = ndf5['Numerodemateriasreprobadasenelsemestreoanoanterior'][(ndf5['Outlier'] == False)]
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Numerodemateriasreprobadasenelsemestreoanoanterior'][(ndf['Outlier'] == False)]
 colors = ['r', 'b']
-out = plt.scatter(idout, Numerodemateriasreprobadasenelsemestreoanoanteriorout, marker='x', color=colors[0], s=100)
-rest = plt.scatter(idnormal, Numerodemateriasreprobadasenelsemestreoanoanteriornormal, marker='o', color=colors[1], s=100)
-
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Numero de materias reprobadas en el semestre o ano anterior por el estudiante')
+plt.title('Outliers: Numero de materias reprobadas en el semestre o ano anterior por los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Numerodemateriasreprobadasenelsemestreoanoanterior.png')
 
 #------------------------------------------------------------------------------Numerodemateriasinscritasenelsemestreoañoanterior
 df.Numerodemateriasinscritasenelsemestreoanoanterior = df.Numerodemateriaaprobadasenelsemestreoanoanterior + df.Numerodemateriasreprobadasenelsemestreoanoanterior + df.Numerodemateriasretiradasenelsemestreoanoanterior
 df.Numerodemateriasinscritasenelsemestreoanoanterior = df.Numerodemateriasinscritasenelsemestreoanoanterior.astype(int)
 
-ndf2 = df.copy()
-ndf2['x-Mean'] = abs(ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].mean())
-ndf2['1.96*std'] = 1.96*ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].std()  
-ndf2['Outlier'] = abs(ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].mean()) > 1.96*ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'].std()
-
-"""
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf['Numerodemateriasinscritasenelsemestreoanoanterior'].mean())
+ndf['1.96*std'] = 1.96*ndf['Numerodemateriasinscritasenelsemestreoanoanterior'].std()  
+ndf['Outlier'] = abs(ndf['Numerodemateriasinscritasenelsemestreoanoanterior'] - ndf['Numerodemateriasinscritasenelsemestreoanoanterior'].mean()) > 1.96*ndf['Numerodemateriasinscritasenelsemestreoanoanterior'].std()
 
 #Grafico los outliers
-idout = ndf2['ID'][(ndf2['Outlier'] == True)]
-Numerodemateriasinscritasenelsemestreoanoanteriorout = ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf2['Outlier'] == True)]
-idnormal = ndf2['ID'][(ndf2['Outlier'] == False)]
-Numerodemateriasinscritasenelsemestreoanoanteriornormal = ndf2['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf2['Outlier'] == False)]
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Numerodemateriasinscritasenelsemestreoanoanterior'][(ndf['Outlier'] == False)]
 colors = ['r', 'b']
-out = plt.scatter(idout, Numerodemateriasinscritasenelsemestreoanoanteriorout, marker='x', color=colors[0], s=100)
-rest = plt.scatter(idnormal, Numerodemateriasinscritasenelsemestreoanoanteriornormal, marker='o', color=colors[1], s=100)
-
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Numero de materias inscritas en el semestre o ano anterior por el estudiante')
+plt.title('Outliers: Numero de materias inscritas en el semestre o ano anterior por los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Numerodemateriasinscritasenelsemestreoanoanterior.png')
 #------------------------------------------------------------------------------Promedioponderadoaprobado
 df.Promedioponderadoaprobado = df.Promedioponderadoaprobado.astype(float)
 for x in df['Promedioponderadoaprobado']:
@@ -414,7 +559,32 @@ for x in df['Promedioponderadoaprobado']:
     
 df['Promedioponderadoaprobado'] = df['Promedioponderadoaprobado'].round(2) 
    
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Promedioponderadoaprobado'] - ndf['Promedioponderadoaprobado'].mean())
+ndf['1.96*std'] = 1.96*ndf['Promedioponderadoaprobado'].std()  
+ndf['Outlier'] = abs(ndf['Promedioponderadoaprobado'] - ndf['Promedioponderadoaprobado'].mean()) > 1.96*ndf['Promedioponderadoaprobado'].std()
 
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Promedioponderadoaprobado'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Promedioponderadoaprobado'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Promedio ponderado por el estudiante')
+plt.title('Outliers: Promedio ponderado por los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Promedioponderadoaprobado.png')
 #------------------------------------------------------------------------------Eficiencia
 df['Eficiencia'].round(2)
 for x in df['Eficiencia']:
@@ -429,27 +599,32 @@ df.Eficiencia = df.Eficiencia.astype(float)
 df['Eficiencia'] = df['Eficiencia'].round(2) 
     
  
-ndf6 = df.copy()
-ndf6['x-Mean'] = abs(ndf6['Eficiencia'] - ndf6['Eficiencia'].mean())
-ndf6['1.96*std'] = 1.96*ndf6['Eficiencia'].std()  
-ndf6['Outlier'] = abs(ndf6['Eficiencia'] - ndf6['Eficiencia'].mean()) > 1.96*ndf6['Eficiencia'].std()
-"""
-#Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
-Eficienciaout = ndf6['Eficiencia'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
-Eficiencianormal = ndf6['Eficiencia'][(ndf6['Outlier'] == False)]
-colors = ['r', 'b']
-out = plt.scatter(idout, Eficienciaout, marker='x', color=colors[0], s=100)
-rest = plt.scatter(idnormal, Eficiencianormal, marker='o', color=colors[1], s=100)
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Eficiencia'] - ndf['Eficiencia'].mean())
+ndf['1.96*std'] = 1.96*ndf['Eficiencia'].std()  
+ndf['Outlier'] = abs(ndf['Eficiencia'] - ndf['Eficiencia'].mean()) > 1.96*ndf['Eficiencia'].std()
 
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Eficiencia'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Eficiencia'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Eficiencia del estudiante')
+plt.title('Outliers: Eficiencia de los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Eficiencia.png')
 
 #------------------------------------------------------------------------------Sireprobounaomasmateriasindiqueelmotivo
 
@@ -458,32 +633,37 @@ Ports_dict = { name : i for i, name in Ports }
 
 df.Sireprobounaomasmateriasindiqueelmotivo = df.Sireprobounaomasmateriasindiqueelmotivo.map( lambda x: Ports_dict[x]).astype(int)    
 
-    
+mode(df['Sireprobounaomasmateriasindiqueelmotivo'])
 
 #------------------------------------------------------------------------------Numerodemateriasinscritasenelsemestreencurso
 df.Numerodemateriasinscritasenelsemestreencurso = df.Numerodemateriasinscritasenelsemestreencurso.astype(int)
 
-ndf6 = df.copy()
-ndf6['x-Mean'] = abs(ndf6['Numerodemateriasinscritasenelsemestreencurso'] - ndf6['Numerodemateriasinscritasenelsemestreencurso'].mean())
-ndf6['1.96*std'] = 1.96*ndf6['Numerodemateriasinscritasenelsemestreencurso'].std()  
-ndf6['Outlier'] = abs(ndf6['Numerodemateriasinscritasenelsemestreencurso'] - ndf6['Numerodemateriasinscritasenelsemestreencurso'].mean()) > 1.96*ndf6['Numerodemateriasinscritasenelsemestreencurso'].std()
-"""
-#Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
-out = ndf6['Numerodemateriasinscritasenelsemestreencurso'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
-normal = ndf6['Numerodemateriasinscritasenelsemestreencurso'][(ndf6['Outlier'] == False)]
-colors = ['r', 'b']
-out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
-rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Numerodemateriasinscritasenelsemestreencurso'] - ndf['Numerodemateriasinscritasenelsemestreencurso'].mean())
+ndf['1.96*std'] = 1.96*ndf['Numerodemateriasinscritasenelsemestreencurso'].std()  
+ndf['Outlier'] = abs(ndf['Numerodemateriasinscritasenelsemestreencurso'] - ndf['Numerodemateriasinscritasenelsemestreencurso'].mean()) > 1.96*ndf['Numerodemateriasinscritasenelsemestreencurso'].std()
 
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Numerodemateriasinscritasenelsemestreencurso'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Numerodemateriasinscritasenelsemestreencurso'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Numero de materias inscritas en el semestre en curso del estudiante')
+plt.title('Outliers: Numero de materias inscritas en el semestre en curso de los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Numerodemateriasinscritasenelsemestreencurso.png')
 #------------------------------------------------------------------------------Seencuentrarealizandotesisopasantiasdegrado
 df['Seencuentrarealizandotesisopasantiasdegrado'] = df['Seencuentrarealizandotesisopasantiasdegrado'].map( {'No': 0, 'Si': 1} ).astype(int)
 
@@ -492,13 +672,78 @@ df['Seencuentrarealizandotesisopasantiasdegrado'] = df['Seencuentrarealizandotes
 df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'].fillna(0, inplace=True)
 df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'] = df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'].map( {0:0,'Primera vez': 1, 'Segunda vez': 2, 'Más de dos': 3} ).astype(float)
 df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'] = df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'].astype(int)
+
+df['SeencuentrarealizandotesisopasantiasdegradoyCantidad'] = df['Seencuentrarealizandotesisopasantiasdegrado']
+#UNIFICACION
+contador2 = 0
+for x in df['SeencuentrarealizandotesisopasantiasdegradoyCantidad']:
+    if x == 1:
+        #print df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'][contador] 
+        df['SeencuentrarealizandotesisopasantiasdegradoyCantidad'][contador2] = df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'][contador2]
+        
+    contador2 = contador2 + 1
+        
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'] - ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'].mean())
+ndf['1.96*std'] = 1.96*ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'].std()  
+ndf['Outlier'] = abs(ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'] - ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'].mean()) > 1.96*ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['SeencuentrarealizandotesisopasantiasdegradoyCantidad'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Cantidad de veces que ha realizado tesis o pasantias de grado el estudiante')
+plt.title('Outliers: Cantidad de veces que ha realizado tesis o pasantias de grado de los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('SeencuentrarealizandotesisopasantiasdegradoyCantidad.png')
+
 #------------------------------------------------------------------------------Procedencia
 df['Procedencia'] = df['Procedencia'].map( {'Municipio Sucre':0,'Guarenas - Guatire': 1, 'Municipio Libertador Caracas': 2, 'Aragua': 3,'Municipio Baruta': 4, 'Valles del Tuy': 5, 'Altos Mirandinos': 6,'Apure': 7, 'Municipio El Hatillo': 8, 'Municipio Chacao': 9,'Táchira': 10, 'Vargas':11, 'Monagas': 12, 'Portuguesa':13, 'Nueva Esparta': 14, 'Trujillo':15, 'Bolívar': 16, 'Barinas':17, 'Sucre': 18, 'Barlovento': 19, 'Anzoategui':20, 'Mérida': 21, 'Delta Amacuro': 22, 'Lara':23, 'Yaracuy': 24, 'Guárico': 25} ).astype(float)
 df['Procedencia'] = df['Procedencia'].astype(int)
+
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Procedencia'] - ndf['Procedencia'].mean())
+ndf['1.96*std'] = 1.96*ndf['Procedencia'].std()  
+ndf['Outlier'] = abs(ndf['Procedencia'] - ndf['Procedencia'].mean()) > 1.96*ndf['Procedencia'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Procedencia'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Procedencia'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Procedencia del estudiante')
+plt.title('Outliers: Procedencia de los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Procedencia.png')
 #------------------------------------------------------------------------------"LugardonderesidemientrasestudiaenlaUniversidad"
 #SUstituyo los valores nulos por su procedencia
 df['LugardonderesidemientrasestudiaenlaUniversidad'].fillna(0, inplace=True)
-df['LugardonderesidemientrasestudiaenlaUniversidad'] = df['LugardonderesidemientrasestudiaenlaUniversidad'].map( {'Municipio Sucre':0,'Guarenas - Guatire': 1, 'Municipio Libertador Caracas': 2, 'Aragua': 3,'Municipio Baruta': 4, 'Valles del Tuy': 5, 'Altos Mirandinos': 6,'Apure': 7, 'Municipio El Hatillo': 8, 'Municipio Chacao': 9,'Táchira': 10, 'Vargas':11, 'Monagas': 12, 'Portuguesa':13, 'Nueva Esparta': 14, 'Trujillo':15, 'Bolívar': 16, 'Barinas':17, 'Sucre': 18, 'Barlovento': 19, 'Anzoategui':20, 'Mérida': 21, 'Delta Amacuro': 22, 'Lara':23, 'Yaracuy': 24, 'Guárico': 25,0:26} ).astype(float)
+df['LugardonderesidemientrasestudiaenlaUniversidad'] = df['LugardonderesidemientrasestudiaenlaUniversidad'].map( {'Municipio Sucre':0,'Guarenas - Guatire': 1, 'Municipio Libertador Caracas': 2, 'Aragua': 3, 'Aragua ': 3,'Municipio Baruta': 4, 'Valles del Tuy': 5, 'Altos Mirandinos': 6,'Apure': 7, 'Municipio El Hatillo': 8, 'Municipio Chacao': 9,'Táchira': 10, 'Vargas':11, 'Monagas': 12, 'Portuguesa':13, 'Nueva Esparta': 14, 'Trujillo':15, 'Bolívar': 16, 'Barinas':17, 'Sucre': 18, 'Barlovento': 19, 'Anzoategui':20, 'Mérida': 21, 'Delta Amacuro': 22, 'Lara':23, 'Yaracuy': 24, 'Guárico': 25,0:26} ).astype(float)
 contador=0
 
 for x in df['LugardonderesidemientrasestudiaenlaUniversidad']:
@@ -508,17 +753,100 @@ for x in df['LugardonderesidemientrasestudiaenlaUniversidad']:
         
     contador=contador+1
     
+
 df['LugardonderesidemientrasestudiaenlaUniversidad'] = df['LugardonderesidemientrasestudiaenlaUniversidad'].astype(int)   
+
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['LugardonderesidemientrasestudiaenlaUniversidad'] - ndf['LugardonderesidemientrasestudiaenlaUniversidad'].mean())
+ndf['1.96*std'] = 1.96*ndf['LugardonderesidemientrasestudiaenlaUniversidad'].std()  
+ndf['Outlier'] = abs(ndf['LugardonderesidemientrasestudiaenlaUniversidad'] - ndf['LugardonderesidemientrasestudiaenlaUniversidad'].mean()) > 1.96*ndf['LugardonderesidemientrasestudiaenlaUniversidad'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['LugardonderesidemientrasestudiaenlaUniversidad'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['LugardonderesidemientrasestudiaenlaUniversidad'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Lugar donde reside mientras estudia en la Universidad el estudiante')
+plt.title('Outliers: Lugar donde reside mientras estudia en la Universidad los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('LugardonderesidemientrasestudiaenlaUniversidad.png')
+
 #------------------------------------------------------------------------------"Personasconlascualesustedvivemientrasestudiaenlauniversidad"
 df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] = df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].map( {'residencia estudiantil':0, 'recidencia':0, 'residencia':0,'Residencia':0,'Esposo (a) Hijos (as) ': 1,'Esposo (a) Hijos (as)\xc2\xa0': 1, 'Familiares paternos': 2, 'Madre': 3,'Familiares maternos': 4, 'Ambos padres': 5, 'Mi Mamá y mi hijo ': 6,'Padre': 7, 'Amigos': 8, 'madre y su esposo,abuela,y mi esposo': 9,'hermana': 10, 'Hermana': 10, 'dos hermanos':11, 'OTROS INQUILINOS': 12, 'hermanas':13, 'madre y hermana': 14, 'madre y hermanos':15, 'Madre y Hermanos':15, 'prima': 16, 'madrina':17, 'sola': 18, 'Mamá y Abuela': 19, 'madre,hermano e hijo':20, 'Madre, Hermano y Sobrina': 21, 'hermano, hermana y mi hijo': 22, 'compañeros de habitacion alquilada':23, 'Padres, hermana y abuelos maternos': 24, 'Madre, Hermana, Abuela': 25, 'abuela': 26, 'Dueños del apartamento donde alquilo la habitacion': 27, 'ambos padres y dos hermanis':28, 'Solo': 29, 'hermano':30, 'dueña del apartamento': 31, 'Madre y hermano': 32} ).astype(float)
 df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] = df['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].astype(int) 
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] - ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].mean())
+ndf['1.96*std'] = 1.96*ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].std()  
+ndf['Outlier'] = abs(ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'] - ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].mean()) > 1.96*ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Personasconlascualesustedvivemientrasestudiaenlauniversidad'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Personas con las cuales vive el estudiante mientras estudian en la universidad')
+plt.title('Outliers: Personas con las cuales viven los estudiantes mientras estudian en la universidad')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Personasconlascualesustedvivemientrasestudiaenlauniversidad.png')
+
 #------------------------------------------------------------------------------"Tipodeviviendadonderesidemientrasestudiaenlauniversidad"
 df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'] = df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].map( {'Quinta o casa quinta':0, 'Apartamento en edifico': 1, 'Casa en barrio urbano': 2, 'Habitación alquilada': 3,'Casa de vecindad': 4, 'Residencia estudiantil': 5, 'Apartamento en quinta - casa quinta o casa': 6,'conserjería ': 7, 'Casa en barrio rural': 8, 'Casa de vecindad': 9,'casa': 10} ).astype(float)
 df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'] = df['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].astype(int) 
+ndf = df.copy()
+ndf['x-Mean'] = abs(ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'] - ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].mean())
+ndf['1.96*std'] = 1.96*ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].std()  
+ndf['Outlier'] = abs(ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'] - ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].mean()) > 1.96*ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Tipodeviviendadonderesidemientrasestudiaenlauniversidad'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Tipo de vivienda donde reside el estudiante mientras estudia en la universidad')
+plt.title('Outliers: Tipo de vivienda donde residen los estudiantes mientras estudian en la universidad')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Tipodeviviendadonderesidemientrasestudiaenlauniversidad.png')
 #------------------------------------------------------------------------------ "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual"
 #Los que tienen 0 significa que no viven en alquiler o residencia estudiantil o no respondieron
 df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].fillna(0, inplace=True)
 for x in df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual']:
+    #Una unidad tributaria es equivalente a 125 bsf
     if x == "1 UT":
         df.loc[df.Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual == x, 'Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] = "125"
 
@@ -526,12 +854,44 @@ for x in df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmo
         precio = re.split('[a-z]+', x, flags=re.IGNORECASE)
         df.loc[df.Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual == x, 'Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] = precio[0]
 df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] = df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].astype(float)
+
+           
+siviven = df.loc[df['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] != 0]
+ndf = siviven.copy()
+ndf['x-Mean'] = abs(ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] - ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].mean())
+ndf['1.96*std'] = 1.96*ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].std()  
+ndf['Outlier'] = abs(ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'] - ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].mean()) > 1.96*ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].std()
+
+#Grafico los outliers
+idout = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == True)]
+valorout = ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'][(ndf['Outlier'] == True)]
+idnormal = ndf['CedulaDeIdentidad'][(ndf['Outlier'] == False)]
+valorUCVnormal = ndf['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'][(ndf['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Monto mensual de la habitacion o residencial alquilada del estudiante')
+plt.title('Outliers: Monto mensual de la habitacion o residencial alquilada de los estudiantes')
+out = plt.scatter(idout, valorout, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, valorUCVnormal, marker='o', color=colors[1], s=100)
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+#siviven['Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual'].describe()
+#mode(respondieron['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'])
+plt.savefig('Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual.png')
+
 #------------------------------------------------------------------------------ "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada"
 
 Ports = list(enumerate(np.unique(df['Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada'])))   
 Ports_dict = { name : i for i, name in Ports }              
 
 df.Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada = df.Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada.map( lambda x: Ports_dict[x]).astype(int)    
+df['Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada'].fillna(0, inplace=True)
+
 
 #------------------------------------------------------------------------------"Contrajomatrimonio"
 df['Contrajomatrimonio'] = df['Contrajomatrimonio'].map( {'No': 0, 'Si': 1} ).astype(int)
@@ -543,6 +903,20 @@ df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion'] = df['Hasolic
 df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].fillna(0, inplace=True)
 df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'] = df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].map( {0:0,'2012, OBE. AYUDA ECONÓMICA. SOLVENTAR GASTOS DE ESTUDIOS Y TRANSPORTE.':13, 'OBE 2011 UCV . Motivo: ayuda económica para mis estudios ': 1, 'AÑO 2011 AYUDA ECONÓMICA POR OBE PARA CUBRIR GASTOS  DE MATERIAL DE ESTUDIO.': 2, 'Beca ayudantía en el año 2011 Universidad Central de Venezuela (OBE) apoyo económico para material de estudio': 3,'solicitud en 2013. \nayuda economica \n': 4, 'Año solicitud 2013\nInstitución: Universidad Central de Venezuela (OBE)\nMotivo: Transporte, Materiales Estudios, Comida': 5, 'fames ayuda para maternidad': 6,'2015, ucv, falta de ingresos, ayuda economica': 7, 'Año: 2013. Institucion: OBE. Motivo: ayuda económica para rehabilitación (fisioterapia), ya que me atropello una moto.': 8, 'Año:2014 \nInstitucion: OBE\nMotivo: Compra de materiales de estudio. ': 9,'fecha:2014\ninstituto:OBE\ncompras de material de estudio': 10,'solicitud 2015 en el instituto OBE , motivo ayuda economica para gastos de la universidad (libro, pasaje, equipo de enfermeria, etc)': 11,'año 2014, OBE, solicitada para cubrir parte de los gastos mensuales estudiantiles': 12} ).astype(float)
 df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'] = df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'].astype(int)
+
+
+
+df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucionyMotivo'] = df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion']
+#UNIFICACION
+contador3 = 0
+for x in df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucionyMotivo']:
+    if x == 1:
+        #print df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'][contador] 
+        df['HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucionyMotivo'][contador3] = df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'][contador3]
+        
+    contador3 = contador3 + 1
+#respondieron = df.loc[df['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'] != 0]
+#mode(respondieron['Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo'])
 #------------------------------------------------------------------------------ "Seencuentraustedrealizandoalgunaactividadquelegenereingresos"
 df['Seencuentraustedrealizandoalgunaactividadquelegenereingresos'] = df['Seencuentraustedrealizandoalgunaactividadquelegenereingresos'].map( {'No': 0, 'Si': 1} ).astype(int)
 
@@ -551,58 +925,82 @@ df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].fillna(0, inplace
 df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'] = df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].map( {0:0,'cuido pacientes parapoder obtener un ingreso economico': 1, 'STAFF DE EMPRESA DEPORTAIVA. UNO O DOS FINES DE SEMANA AL MES APROXIMADAMENTE.': 2, 'Recreación, algunos fines de semana (poco frecuente por falta de tiempo).': 3,'Secretaria, sólo los sábados medio turno.': 4} ).astype(float)
 df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'] = df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'].astype(int)
 
+respondieron = df.loc[df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'] != 0]
+#mode(respondieron['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'])
+
+df['SeencuentraustedrealizandoalgunaactividadquelegenereingresosIndiqueActividad'] = df['Seencuentraustedrealizandoalgunaactividadquelegenereingresos']
+#UNIFICACION
+contador4 = 0
+for x in df['SeencuentraustedrealizandoalgunaactividadquelegenereingresosIndiqueActividad']:
+    if x == 1:
+        #print df['Cantidaddevecesqueharealizadotesisopasantiasdegrado'][contador] 
+        df['SeencuentraustedrealizandoalgunaactividadquelegenereingresosIndiqueActividad'][contador4] = df['Encasodeserafirmativoindiquetipodeactividadysufrecuencia'][contador4]
+        
+    contador4 = contador4 + 1
+
 #------------------------------------------------------------------------------"Montomensualdelabeca"
 df.Montomensualdelabeca = df.Montomensualdelabeca.astype(float)
-ndf6 = df.copy()
-ndf6['x-Mean'] = abs(ndf6['Montomensualdelabeca'] - ndf6['Montomensualdelabeca'].mean())
-ndf6['1.96*std'] = 1.96*ndf6['Montomensualdelabeca'].std()  
-ndf6['Outlier'] = abs(ndf6['Montomensualdelabeca'] - ndf6['Montomensualdelabeca'].mean()) > 1.96*ndf6['Montomensualdelabeca'].std()
+ 
+#Hago una copia del dataframe, para hayar los OUTLIERS
+newdf = df.copy()
+newdf['x-Mean'] = abs(newdf['Montomensualdelabeca'] - newdf['Montomensualdelabeca'].mean())
+newdf['1.96*std'] = 1.96*newdf['Montomensualdelabeca'].std()  
+newdf['Outlier'] = abs(newdf['Montomensualdelabeca'] - newdf['Montomensualdelabeca'].mean()) > 1.96*newdf['Montomensualdelabeca'].std()
 
-"""
-#Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
-out = ndf6['Montomensualdelabeca'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
-normal = ndf6['Montomensualdelabeca'][(ndf6['Outlier'] == False)]
+# data 
+idout = newdf['CedulaDeIdentidad'][(newdf['Outlier'] == True)]
+out = newdf['Montomensualdelabeca'][(newdf['Outlier'] == True)]
+idnormal = newdf['CedulaDeIdentidad'][(newdf['Outlier'] == False)]
+normal = newdf['Montomensualdelabeca'][(newdf['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Monto mensual de la beca del estudiante')
+plt.title('Outliers: Monto mensual de la beca de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()
-"""
+           
+
+plt.savefig('Montomensualdelabeca.png')
 #------------------------------------------------------------------------------ "Aportemensualquelebrindasuresponsableeconomico"
 df['Aportemensualquelebrindasuresponsableeconomico'].fillna(0, inplace=True)
 df.Aportemensualquelebrindasuresponsableeconomico = df.Aportemensualquelebrindasuresponsableeconomico.astype(float)
 
-
+#Hago una copia del dataframe, para hayar los OUTLIERS
 ndf6 = df.copy()
 ndf6['x-Mean'] = abs(ndf6['Aportemensualquelebrindasuresponsableeconomico'] - ndf6['Aportemensualquelebrindasuresponsableeconomico'].mean())
 ndf6['1.96*std'] = 1.96*ndf6['Aportemensualquelebrindasuresponsableeconomico'].std()  
 ndf6['Outlier'] = abs(ndf6['Aportemensualquelebrindasuresponsableeconomico'] - ndf6['Aportemensualquelebrindasuresponsableeconomico'].mean()) > 1.96*ndf6['Aportemensualquelebrindasuresponsableeconomico'].std()
-"""
-#Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Aportemensualquelebrindasuresponsableeconomico'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Aportemensualquelebrindasuresponsableeconomico'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Aporte mensual que le brinda el responsable economico del estudiante')
+plt.title('Outliers: Aporte mensual que le brinda el responsable economico de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()
-"""
+           
+
+plt.savefig('Aportemensualquelebrindasuresponsableeconomico.png')
 #------------------------------------------------------------------------------"Aportemensualquerecibedefamiliaresoamigos"
 df['Aportemensualquerecibedefamiliaresoamigos'].fillna(0, inplace=True)
 df.Aportemensualquerecibedefamiliaresoamigos = df.Aportemensualquerecibedefamiliaresoamigos.astype(float)
@@ -612,25 +1010,28 @@ ndf6 = df.copy()
 ndf6['x-Mean'] = abs(ndf6['Aportemensualquerecibedefamiliaresoamigos'] - ndf6['Aportemensualquerecibedefamiliaresoamigos'].mean())
 ndf6['1.96*std'] = 1.96*ndf6['Aportemensualquerecibedefamiliaresoamigos'].std()  
 ndf6['Outlier'] = abs(ndf6['Aportemensualquerecibedefamiliaresoamigos'] - ndf6['Aportemensualquerecibedefamiliaresoamigos'].mean()) > 1.96*ndf6['Aportemensualquerecibedefamiliaresoamigos'].std()
-
-"""
-#Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Aportemensualquerecibedefamiliaresoamigos'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Aportemensualquerecibedefamiliaresoamigos'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Aporte mensual que recibe de familiares o amigos el estudiante')
+plt.title('Outliers: Aporte mensual que recibe de familiares o amigos los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()
-"""
+           
+
+plt.savefig('Aportemensualquerecibedefamiliaresoamigos.png')
 
 #------------------------------------------------------------------------------"Ingresomensualquerecibeporactividadesadestajooporhoras"
 
@@ -643,26 +1044,61 @@ ndf6['x-Mean'] = abs(ndf6['Ingresomensualquerecibeporactividadesadestajooporhora
 ndf6['1.96*std'] = 1.96*ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'].std()  
 ndf6['Outlier'] = abs(ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'] - ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'].mean()) > 1.96*ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'].std()
 
-"""
+
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Ingresomensualquerecibeporactividadesadestajooporhoras'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Ingreso mensual que recibe por actividades de trabajo por horas  el estudiante')
+plt.title('Outliers: Ingreso mensual que reciben por actividades de trabajo por horas los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()
-"""
+           
+
+plt.savefig('Ingresomensualquerecibeporactividadesadestajooporhoras.png')
 #------------------------------------------------------------------------------"Ingresomensualtotal"
 df['Ingresomensualtotal'] = df.Montomensualdelabeca + df.Aportemensualquelebrindasuresponsableeconomico + df.Aportemensualquerecibedefamiliaresoamigos + df.Ingresomensualquerecibeporactividadesadestajooporhoras
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Ingresomensualtotal'] - ndf6['Ingresomensualtotal'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Ingresomensualtotal'].std()  
+ndf6['Outlier'] = abs(ndf6['Ingresomensualtotal'] - ndf6['Ingresomensualtotal'].mean()) > 1.96*ndf6['Ingresomensualtotal'].std()
+
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Ingresomensualtotal'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Ingresomensualtotal'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Ingreso mensual total del estudiante')
+plt.title('Outliers: Ingreso mensual total de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Ingresomensualtotal.png')
 
 
 #------------------------------------------------------------------------------"Gastosenalimentacionpersonal"
@@ -674,24 +1110,29 @@ ndf6['x-Mean'] = abs(ndf6['Gastosenalimentacionpersonal'] - ndf6['Gastosenalimen
 ndf6['1.96*std'] = 1.96*ndf6['Gastosenalimentacionpersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Gastosenalimentacionpersonal'] - ndf6['Gastosenalimentacionpersonal'].mean()) > 1.96*ndf6['Gastosenalimentacionpersonal'].std()
 
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Gastosenalimentacionpersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Gastosenalimentacionpersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en alimentacion personal del estudiante')
+plt.title('Outliers: Gastos en alimentacion personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()
-"""
+           
+
+plt.savefig('Gastosenalimentacionpersonal.png')
 #------------------------------------------------------------------------------"Gastosentransportepersonal"
 df['Gastosentransportepersonal'].fillna(0, inplace=True)
 df.Gastosentransportepersonal = df.Gastosentransportepersonal.astype(float)
@@ -700,25 +1141,29 @@ ndf6 = df.copy()
 ndf6['x-Mean'] = abs(ndf6['Gastosentransportepersonal'] - ndf6['Gastosentransportepersonal'].mean())
 ndf6['1.96*std'] = 1.96*ndf6['Gastosentransportepersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Gastosentransportepersonal'] - ndf6['Gastosentransportepersonal'].mean()) > 1.96*ndf6['Gastosentransportepersonal'].std()
-
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Gastosentransportepersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Gastosentransportepersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en transporte personal del estudiante')
+plt.title('Outliers: Gastos en transporte personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()
-"""
+           
+
+plt.savefig('Gastosentransportepersonal.png')
 #------------------------------------------------------------------------------"Gastosmedicospersonal"
 df['Gastosmedicospersonal'].fillna(0, inplace=True)
 df.Gastosmedicospersonal = df.Gastosmedicospersonal.astype(float)
@@ -727,24 +1172,29 @@ ndf6 = df.copy()
 ndf6['x-Mean'] = abs(ndf6['Gastosmedicospersonal'] - ndf6['Gastosmedicospersonal'].mean())
 ndf6['1.96*std'] = 1.96*ndf6['Gastosmedicospersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Gastosmedicospersonal'] - ndf6['Gastosmedicospersonal'].mean()) > 1.96*ndf6['Gastosmedicospersonal'].std()
-
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Gastosmedicospersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Gastosmedicospersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos medicos personal del estudiante')
+plt.title('Outliers: Gastos medicos personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Gastosmedicospersonal.png')
 #------------------------------------------------------------------------------"Gastosodontologicospersonal"
 df['Gastosodontologicospersonal'].fillna(0, inplace=True)
 df.Gastosodontologicospersonal = df.Gastosodontologicospersonal.astype(float)
@@ -753,24 +1203,29 @@ ndf6 = df.copy()
 ndf6['x-Mean'] = abs(ndf6['Gastosodontologicospersonal'] - ndf6['Gastosodontologicospersonal'].mean())
 ndf6['1.96*std'] = 1.96*ndf6['Gastosodontologicospersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Gastosodontologicospersonal'] - ndf6['Gastosodontologicospersonal'].mean()) > 1.96*ndf6['Gastosodontologicospersonal'].std()
-
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Gastosodontologicospersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Gastosodontologicospersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos odontologicos personal del estudiante')
+plt.title('Outliers: Gastos odontologicos personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Gastosodontologicospersonal.png')
 #------------------------------------------------------------------------------"Gastospersonales"
 df['Gastospersonales'].fillna(0, inplace=True)
 df.Gastospersonales = df.Gastospersonales.astype(float)
@@ -780,23 +1235,29 @@ ndf6['x-Mean'] = abs(ndf6['Gastospersonales'] - ndf6['Gastospersonales'].mean())
 ndf6['1.96*std'] = 1.96*ndf6['Gastospersonales'].std()  
 ndf6['Outlier'] = abs(ndf6['Gastospersonales'] - ndf6['Gastospersonales'].mean()) > 1.96*ndf6['Gastospersonales'].std()
 
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Gastospersonales'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Gastospersonales'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos personales del estudiante')
+plt.title('Outliers: Gastos personales de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Gastospersonales.png')
 #------------------------------------------------------------------------------"Gastosenresidenciaohabitacionalquiladapersonal"
 df['Gastosenresidenciaohabitacionalquiladapersonal'].fillna(0, inplace=True)
 df.Gastosenresidenciaohabitacionalquiladapersonal = df.Gastosenresidenciaohabitacionalquiladapersonal.astype(float)
@@ -806,23 +1267,29 @@ ndf6['x-Mean'] = abs(ndf6['Gastosenresidenciaohabitacionalquiladapersonal'] - nd
 ndf6['1.96*std'] = 1.96*ndf6['Gastosenresidenciaohabitacionalquiladapersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Gastosenresidenciaohabitacionalquiladapersonal'] - ndf6['Gastosenresidenciaohabitacionalquiladapersonal'].mean()) > 1.96*ndf6['Gastosenresidenciaohabitacionalquiladapersonal'].std()
 
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Gastosenresidenciaohabitacionalquiladapersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Gastosenresidenciaohabitacionalquiladapersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en residencia o habitacion alquilada personal del estudiante')
+plt.title('Outliers: Gastos en residencia o habitacion alquilada personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Gastosenresidenciaohabitacionalquiladapersonal.png')
 #------------------------------------------------------------------------------"GastosenMaterialesdeestudiopersonal"
 df['GastosenMaterialesdeestudiopersonal'].fillna(0, inplace=True)
 df.GastosenMaterialesdeestudiopersonal = df.GastosenMaterialesdeestudiopersonal.astype(float)
@@ -832,23 +1299,30 @@ ndf6['x-Mean'] = abs(ndf6['GastosenMaterialesdeestudiopersonal'] - ndf6['Gastose
 ndf6['1.96*std'] = 1.96*ndf6['GastosenMaterialesdeestudiopersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['GastosenMaterialesdeestudiopersonal'] - ndf6['GastosenMaterialesdeestudiopersonal'].mean()) > 1.96*ndf6['GastosenMaterialesdeestudiopersonal'].std()
 
-"""
+
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['GastosenMaterialesdeestudiopersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['GastosenMaterialesdeestudiopersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en materiales de estudio personal del estudiante')
+plt.title('Outliers: Gastos en materiales de estudio personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('GastosenMaterialesdeestudiopersonal.png')
 #------------------------------------------------------------------------------"Gastosenrecreacionpersonal"
 df['Gastosenrecreacionpersonal'].fillna(0, inplace=True)
 df.Gastosenrecreacionpersonal = df.Gastosenrecreacionpersonal.astype(float)
@@ -858,23 +1332,29 @@ ndf6['x-Mean'] = abs(ndf6['Gastosenrecreacionpersonal'] - ndf6['Gastosenrecreaci
 ndf6['1.96*std'] = 1.96*ndf6['Gastosenrecreacionpersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Gastosenrecreacionpersonal'] - ndf6['Gastosenrecreacionpersonal'].mean()) > 1.96*ndf6['Gastosenrecreacionpersonal'].std()
 
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Gastosenrecreacionpersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Gastosenrecreacionpersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en recreacion personal del estudiante')
+plt.title('Outliers: Gastos en recreacion personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Gastosenrecreacionpersonal.png')
 #------------------------------------------------------------------------------"Otrosgastospersonal"
 df['Otrosgastospersonal'].fillna(0, inplace=True)
 df.Otrosgastospersonal = df.Otrosgastospersonal.astype(float)
@@ -884,23 +1364,30 @@ ndf6['x-Mean'] = abs(ndf6['Otrosgastospersonal'] - ndf6['Otrosgastospersonal'].m
 ndf6['1.96*std'] = 1.96*ndf6['Otrosgastospersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Otrosgastospersonal'] - ndf6['Otrosgastospersonal'].mean()) > 1.96*ndf6['Otrosgastospersonal'].std()
 
-"""
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Otrosgastospersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Otrosgastospersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Otros gastos personales del estudiante')
+plt.title('Outliers: Otros gastos personales de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Otrosgastospersonal.png')
+
 #------------------------------------------------------------------------------"Totalegresospersonal"
 df['Totalegresospersonal'] = df.Gastosenalimentacionpersonal + df.Gastosentransportepersonal + df.Gastosmedicospersonal + df.Gastosodontologicospersonal + df.Gastospersonales + df.Gastosenresidenciaohabitacionalquiladapersonal + df.GastosenMaterialesdeestudiopersonal + df.Gastosenrecreacionpersonal + df.Otrosgastospersonal
 ndf6 = df.copy()
@@ -908,26 +1395,35 @@ ndf6['x-Mean'] = abs(ndf6['Totalegresospersonal'] - ndf6['Totalegresospersonal']
 ndf6['1.96*std'] = 1.96*ndf6['Totalegresospersonal'].std()  
 ndf6['Outlier'] = abs(ndf6['Totalegresospersonal'] - ndf6['Totalegresospersonal'].mean()) > 1.96*ndf6['Totalegresospersonal'].std()
 
-"""
+
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Totalegresospersonal'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Totalegresospersonal'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Total egresos personal del estudiante')
+plt.title('Outliers: Total egresos personal de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Totalegresospersonal.png')
+
 #------------------------------------------------------------------------------"Indiquequienessuresponsableeconomico"
 df['Indiquequienessuresponsableeconomico'] = df['Indiquequienessuresponsableeconomico'].map( {'Usted mismo':0,'esposo': 1, 'ninguno': 2, 'Madre': 3,'Familiares': 4, 'Padre': 5, 'Ambos padres': 6,'Cónyugue': 7, 'tia': 8, 'Hermano': 9,'hermana': 10,'MI HERMANA': 10, 'abuela': 10, 'dos hermanos':11, 'OTROS INQUILINOS': 12, 'hermanas':13, 'madre y hermana': 14, 'madre y hermanos':15, 'Madre y Hermanos':15, 'prima': 16, 'madrina':17, 'sola': 18, 'Mamá y Abuela': 19, 'madre,hermano e hijo':20, 'Madre, Hermano y Sobrina': 21, 'hermano, hermana y mi hijo': 22, 'compañeros de habitacion alquilada':23, 'Padres, hermana y abuelos maternos': 24, 'Madre, Hermana, Abuela': 25, 'abuela': 26, 'Dueños del apartamento donde alquilo la habitacion': 27, 'ambos padres y dos hermanis':28, 'Solo': 29, 'hermano':30, 'dueña del apartamento': 31, 'Madre y hermano': 32} ).astype(float)
 df['Indiquequienessuresponsableeconomico'] = df['Indiquequienessuresponsableeconomico'].astype(int)
+
 #------------------------------------------------------------------------------"Cargafamiliar"
 df.Cargafamiliar = df.Cargafamiliar.astype(int)
 
@@ -936,23 +1432,30 @@ ndf6['x-Mean'] = abs(ndf6['Cargafamiliar'] - ndf6['Cargafamiliar'].mean())
 ndf6['1.96*std'] = 1.96*ndf6['Cargafamiliar'].std()  
 ndf6['Outlier'] = abs(ndf6['Cargafamiliar'] - ndf6['Cargafamiliar'].mean()) > 1.96*ndf6['Cargafamiliar'].std()
 
-"""
+
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Cargafamiliar'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Cargafamiliar'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Carga familiar del estudiante')
+plt.title('Outliers: Carga familiar de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Cargafamiliar.png')
 #------------------------------------------------------------------------------"Ingresomensualdesuresponsableeconomico"
 for x in df['Ingresomensualdesuresponsableeconomico']:
    if RepresentsFloat(x) == False:
@@ -973,24 +1476,29 @@ ndf6['x-Mean'] = abs(ndf6['Ingresomensualdesuresponsableeconomico'] - ndf6['Ingr
 ndf6['1.96*std'] = 1.96*ndf6['Ingresomensualdesuresponsableeconomico'].std()  
 ndf6['Outlier'] = abs(ndf6['Ingresomensualdesuresponsableeconomico'] - ndf6['Ingresomensualdesuresponsableeconomico'].mean()) > 1.96*ndf6['Ingresomensualdesuresponsableeconomico'].std()
 
-    
-""" 
 #Grafico los outliers
-idout = ndf6['ID'][(ndf6['Outlier'] == True)]
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
 out = ndf6['Ingresomensualdesuresponsableeconomico'][(ndf6['Outlier'] == True)]
-idnormal = ndf6['ID'][(ndf6['Outlier'] == False)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
 normal = ndf6['Ingresomensualdesuresponsableeconomico'][(ndf6['Outlier'] == False)]
 colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Ingreso mensual del responsable economico del estudiante')
+plt.title('Outliers: Ingreso mensual del responsable economico de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
 plt.legend((out, rest),
-           ('Outlier', 'Normal student'),
+           ('Outlier', 'Estudiante promedio'),
            scatterpoints=1,
            loc='lower left',
            ncol=3,
            fontsize=8)
-plt.figure()"""
+           
+
+plt.savefig('Ingresomensualdesuresponsableeconomico.png')
 #------------------------------------------------------------------------------"Otrosingresos"
 df['Otrosingresos'].fillna(0, inplace=True)
 for x in df['Otrosingresos']:
@@ -1012,9 +1520,69 @@ for x in df['Otrosingresos']:
          
 df.Otrosingresos = df.Otrosingresos.astype(float)
 
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Otrosingresos'] - ndf6['Otrosingresos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Otrosingresos'].std()  
+ndf6['Outlier'] = abs(ndf6['Otrosingresos'] - ndf6['Otrosingresos'].mean()) > 1.96*ndf6['Otrosingresos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Otrosingresos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Otrosingresos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Otros ingresos del estudiante')
+plt.title('Outliers: Otros ingresos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Otrosingresos.png')
+
 #------------------------------------------------------------------------------"Totaldeingresos"
 df['Totaldeingresos'] = df.Ingresomensualdesuresponsableeconomico + df.Otrosingresos 
+df['Totaldeingresos'] = df['Totaldeingresos'].astype(float)
 
+#df_norm = (df['Totaldeingresos'] - df['Totaldeingresos'].mean()) / (df['Totaldeingresos'].max() - df['Totaldeingresos'].min())
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Totaldeingresos'] - ndf6['Totaldeingresos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Totaldeingresos'].std()  
+ndf6['Outlier'] = abs(ndf6['Totaldeingresos'] - ndf6['Totaldeingresos'].mean()) > 1.96*ndf6['Totaldeingresos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Totaldeingresos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Totaldeingresos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Total de ingresos del estudiante')
+plt.title('Outliers: Total de ingresos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Totaldeingresos.png')
 #------------------------------------------------------------------------------"Gastosenviviendadesusresponsableseconomicos"
 df['Gastosenviviendadesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Gastosenviviendadesusresponsableseconomicos']:
@@ -1036,6 +1604,35 @@ for x in df['Gastosenviviendadesusresponsableseconomicos']:
          
 df.Gastosenviviendadesusresponsableseconomicos = df.Gastosenviviendadesusresponsableseconomicos.astype(float)
 
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosenviviendadesusresponsableseconomicos'] - ndf6['Gastosenviviendadesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosenviviendadesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosenviviendadesusresponsableseconomicos'] - ndf6['Gastosenviviendadesusresponsableseconomicos'].mean()) > 1.96*ndf6['Gastosenviviendadesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosenviviendadesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosenviviendadesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en vivienda de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos en vivienda de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Gastosenviviendadesusresponsableseconomicos.png')
 #------------------------------------------------------------------------------"Gastosenalimentaciondesusresponsableseconomicos"
 df['Gastosenalimentaciondesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Gastosenalimentaciondesusresponsableseconomicos']:
@@ -1057,6 +1654,34 @@ for x in df['Gastosenalimentaciondesusresponsableseconomicos']:
          
 df.Gastosenalimentaciondesusresponsableseconomicos = df.Gastosenalimentaciondesusresponsableseconomicos.astype(float)
 
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosenalimentaciondesusresponsableseconomicos'] - ndf6['Gastosenalimentaciondesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosenalimentaciondesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosenalimentaciondesusresponsableseconomicos'] - ndf6['Gastosenalimentaciondesusresponsableseconomicos'].mean()) > 1.96*ndf6['Gastosenalimentaciondesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosenalimentaciondesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosenalimentaciondesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en alimentacion de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos en alimentacion de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Gastosenalimentaciondesusresponsableseconomicos.png')
 #------------------------------------------------------------------------------"Gastosentransportedesusresponsableseconomicos"
 df['Gastosentransportedesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Gastosentransportedesusresponsableseconomicos']:
@@ -1077,6 +1702,35 @@ for x in df['Gastosentransportedesusresponsableseconomicos']:
            
          
 df.Gastosentransportedesusresponsableseconomicos = df.Gastosentransportedesusresponsableseconomicos.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosentransportedesusresponsableseconomicos'] - ndf6['Gastosentransportedesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosentransportedesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosentransportedesusresponsableseconomicos'] - ndf6['Gastosentransportedesusresponsableseconomicos'].mean()) > 1.96*ndf6['Gastosentransportedesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosentransportedesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosentransportedesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en transporte de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos en transporte de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Gastosentransportedesusresponsableseconomicos.png')
 #------------------------------------------------------------------------------"Gastosmedicosdesusresponsableseconomicos"
 df['Gastosmedicosdesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Gastosmedicosdesusresponsableseconomicos']:
@@ -1097,6 +1751,36 @@ for x in df['Gastosmedicosdesusresponsableseconomicos']:
            
          
 df.Gastosmedicosdesusresponsableseconomicos = df.Gastosmedicosdesusresponsableseconomicos.astype(float)
+
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosmedicosdesusresponsableseconomicos'] - ndf6['Gastosmedicosdesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosmedicosdesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosmedicosdesusresponsableseconomicos'] - ndf6['Gastosmedicosdesusresponsableseconomicos'].mean()) > 1.96*ndf6['Gastosmedicosdesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosmedicosdesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosmedicosdesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos medicos de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos medicos de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Gastosmedicosdesusresponsableseconomicos.png')
 #------------------------------------------------------------------------------"Gastosodontologicosdesusresponsableseconomicos"
 df['Gastosodontologicosdesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Gastosodontologicosdesusresponsableseconomicos']:
@@ -1117,6 +1801,35 @@ for x in df['Gastosodontologicosdesusresponsableseconomicos']:
            
          
 df.Gastosodontologicosdesusresponsableseconomicos = df.Gastosodontologicosdesusresponsableseconomicos.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosodontologicosdesusresponsableseconomicos'] - ndf6['Gastosodontologicosdesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosodontologicosdesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosodontologicosdesusresponsableseconomicos'] - ndf6['Gastosodontologicosdesusresponsableseconomicos'].mean()) > 1.96*ndf6['Gastosodontologicosdesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosodontologicosdesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosodontologicosdesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos odontologicos de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos odontologicos de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Gastosodontologicosdesusresponsableseconomicos.png')
 #------------------------------------------------------------------------------"Gastoseducativosdesusresponsableseconomicos"
 df['Gastoseducativosdesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Gastoseducativosdesusresponsableseconomicos']:
@@ -1137,6 +1850,36 @@ for x in df['Gastoseducativosdesusresponsableseconomicos']:
            
          
 df.Gastoseducativosdesusresponsableseconomicos = df.Gastoseducativosdesusresponsableseconomicos.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastoseducativosdesusresponsableseconomicos'] - ndf6['Gastoseducativosdesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastoseducativosdesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastoseducativosdesusresponsableseconomicos'] - ndf6['Gastoseducativosdesusresponsableseconomicos'].mean()) > 1.96*ndf6['Gastoseducativosdesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastoseducativosdesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastoseducativosdesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos educativos de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos educativos de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Gastoseducativosdesusresponsableseconomicos.png')
+
 #------------------------------------------------------------------------------"Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos"
 df['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos']:
@@ -1157,6 +1900,35 @@ for x in df['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsablesecon
            
          
 df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos = df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos.astype(float)
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'] - ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'] - ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'].mean()) > 1.96*ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en servicios publicos de agua luz telefono y gas de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos en servicios publicos de agua luz telefono y gas de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos.png')
+
 #------------------------------------------------------------------------------"Condominiodesusresponsableseconomicos"
 df['Condominiodesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Condominiodesusresponsableseconomicos']:
@@ -1177,6 +1949,35 @@ for x in df['Condominiodesusresponsableseconomicos']:
            
          
 df.Condominiodesusresponsableseconomicos = df.Condominiodesusresponsableseconomicos.astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Condominiodesusresponsableseconomicos'] - ndf6['Condominiodesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Condominiodesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Condominiodesusresponsableseconomicos'] - ndf6['Condominiodesusresponsableseconomicos'].mean()) > 1.96*ndf6['Condominiodesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Condominiodesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Condominiodesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Gastos en condominio de los responsables economicos del estudiante')
+plt.title('Outliers: Gastos en condominio de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Condominiodesusresponsableseconomicos.png')
 #------------------------------------------------------------------------------"Otrosgastosdesusresponsableseconomicos"
 df['Otrosgastosdesusresponsableseconomicos'].fillna(0, inplace=True)
 for x in df['Otrosgastosdesusresponsableseconomicos']:
@@ -1202,17 +2003,19 @@ df.Otrosgastosdesusresponsableseconomicos = df.Otrosgastosdesusresponsablesecono
 df['Totaldeegresosdesusresponsableseconomicos'] = df.Gastosenviviendadesusresponsableseconomicos + df.Gastosenalimentaciondesusresponsableseconomicos + df.Gastosentransportedesusresponsableseconomicos + df.Gastosmedicosdesusresponsableseconomicos + df.Gastosodontologicosdesusresponsableseconomicos + df.Gastoseducativosdesusresponsableseconomicos + df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos + df.Condominiodesusresponsableseconomicos + df.Otrosgastosdesusresponsableseconomicos
 #------------------------------------------------------------------------------"DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE"
 df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE = df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE.astype(int)
+mode(df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE)
 #------------------------------------------------------------------------------"Sugerenciasyrecomendacionesparamejorarnuestraatencion"
 
 Ports = list(enumerate(np.unique(df['Sugerenciasyrecomendacionesparamejorarnuestraatencion'])))   
 Ports_dict = { name : i for i, name in Ports }              
 
 df.Sugerenciasyrecomendacionesparamejorarnuestraatencion = df.Sugerenciasyrecomendacionesparamejorarnuestraatencion.map( lambda x: Ports_dict[x]).astype(int)    
+mode(df.Sugerenciasyrecomendacionesparamejorarnuestraatencion)
 #------------------------------------------------------------------------------
-cols = ["ID", "SemestreAcademicoarenovar", "AnoAcademicoarenovar", "CedulaDeIdentidad", "DiadeNacimiento", "MesdeNacimiento", "AnodeNacimiento", "Edad", "EstadoCivil", "Sexo", "Escuela", "AnodeIngresoalaUCV", "ModalidaddeIngresoalaUCV", "Semestrequecursa", "Hacambiadousteddedireccion", "Deserafirmativoindiqueelmotivo", "Numerodemateriasinscritasenelsemestreoanoanterior", "Numerodemateriaaprobadasenelsemestreoanoanterior", "Numerodemateriasretiradasenelsemestreoanoanterior", "Numerodemateriasreprobadasenelsemestreoanoanterior", "Promedioponderadoaprobado", "Eficiencia", "Sireprobounaomasmateriasindiqueelmotivo", "Numerodemateriasinscritasenelsemestreencurso", "Seencuentrarealizandotesisopasantiasdegrado", "Cantidaddevecesqueharealizadotesisopasantiasdegrado", "Procedencia", "LugardonderesidemientrasestudiaenlaUniversidad", "Personasconlascualesustedvivemientrasestudiaenlauniversidad", "Tipodeviviendadonderesidemientrasestudiaenlauniversidad", "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual", "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada", "Contrajomatrimonio", "HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucion", "Encasoafirmativosenaleelanodelasolicitudinstitucionymotivo", "Seencuentraustedrealizandoalgunaactividadquelegenereingresos", "Encasodeserafirmativoindiquetipodeactividadysufrecuencia", "Montomensualdelabeca",  "Aportemensualquelebrindasuresponsableeconomico", "Aportemensualquerecibedefamiliaresoamigos", "Ingresomensualquerecibeporactividadesadestajooporhoras", "Ingresomensualtotal", "Gastosenalimentacionpersonal", "Gastosentransportepersonal", "Gastosmedicospersonal", "Gastosodontologicospersonal", "Gastospersonales", "Gastosenresidenciaohabitacionalquiladapersonal", "GastosenMaterialesdeestudiopersonal", "Gastosenrecreacionpersonal", "Otrosgastospersonal", "Totalegresospersonal", "Indiquequienessuresponsableeconomico", "Cargafamiliar", "Ingresomensualdesuresponsableeconomico", "Otrosingresos", "Totaldeingresos", "Gastosenviviendadesusresponsableseconomicos", "Gastosenalimentaciondesusresponsableseconomicos",  "Gastosentransportedesusresponsableseconomicos", "Gastosmedicosdesusresponsableseconomicos", "Gastosodontologicosdesusresponsableseconomicos", "Gastoseducativosdesusresponsableseconomicos", "Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos", "Condominiodesusresponsableseconomicos", "Otrosgastosdesusresponsableseconomicos", "Totaldeegresosdesusresponsableseconomicos", "DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE", "Sugerenciasyrecomendacionesparamejorarnuestraatencion"]
+cols = ["CedulaDeIdentidad", "SemestreAcademicoarenovar", "AnoAcademicoarenovar", "DiadeNacimiento", "MesdeNacimiento", "AnodeNacimiento", "EstadoCivil", "Sexo", "Escuela", "AnodeIngresoalaUCV", "ModalidaddeIngresoalaUCV", "Semestrequecursa", 'HacambiadousteddedireccionyMotivo', "Numerodemateriaaprobadasenelsemestreoanoanterior", "Numerodemateriasretiradasenelsemestreoanoanterior", "Numerodemateriasreprobadasenelsemestreoanoanterior", "Promedioponderadoaprobado", "Eficiencia", "Sireprobounaomasmateriasindiqueelmotivo", "Numerodemateriasinscritasenelsemestreencurso", "SeencuentrarealizandotesisopasantiasdegradoyCantidad", "Procedencia", "LugardonderesidemientrasestudiaenlaUniversidad", "Personasconlascualesustedvivemientrasestudiaenlauniversidad", "Tipodeviviendadonderesidemientrasestudiaenlauniversidad", "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual", "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada", "HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucionyMotivo", "SeencuentraustedrealizandoalgunaactividadquelegenereingresosIndiqueActividad", "Montomensualdelabeca",  "Aportemensualquelebrindasuresponsableeconomico", "Aportemensualquerecibedefamiliaresoamigos", "Ingresomensualquerecibeporactividadesadestajooporhoras", "Gastosenalimentacionpersonal", "Gastosentransportepersonal", "Gastosmedicospersonal", "Gastosodontologicospersonal", "Gastospersonales", "Gastosenresidenciaohabitacionalquiladapersonal", "GastosenMaterialesdeestudiopersonal", "Gastosenrecreacionpersonal", "Otrosgastospersonal", "Indiquequienessuresponsableeconomico", "Cargafamiliar", "Ingresomensualdesuresponsableeconomico", "Otrosingresos", "Gastosenviviendadesusresponsableseconomicos", "Gastosenalimentaciondesusresponsableseconomicos",  "Gastosentransportedesusresponsableseconomicos", "Gastosmedicosdesusresponsableseconomicos", "Gastosodontologicosdesusresponsableseconomicos", "Gastoseducativosdesusresponsableseconomicos", "Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos", "Condominiodesusresponsableseconomicos", "Otrosgastosdesusresponsableseconomicos", "DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE", "Sugerenciasyrecomendacionesparamejorarnuestraatencion"]
 df = df[cols]
-df = df.sort_values(by='ID', ascending= True)
-df.describe()
+df = df.sort_values(by='CedulaDeIdentidad', ascending= True)
+#df.describe()
 #df.head()
 #Genero el .cvs a partir del dataframe
 df.to_csv("minable.csv")
