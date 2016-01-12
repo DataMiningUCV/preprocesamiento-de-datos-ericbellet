@@ -633,7 +633,7 @@ Ports_dict = { name : i for i, name in Ports }
 
 df.Sireprobounaomasmateriasindiqueelmotivo = df.Sireprobounaomasmateriasindiqueelmotivo.map( lambda x: Ports_dict[x]).astype(int)    
 
-mode(df['Sireprobounaomasmateriasindiqueelmotivo'])
+#mode(df['Sireprobounaomasmateriasindiqueelmotivo'])
 
 #------------------------------------------------------------------------------Numerodemateriasinscritasenelsemestreencurso
 df.Numerodemateriasinscritasenelsemestreencurso = df.Numerodemateriasinscritasenelsemestreencurso.astype(int)
@@ -1965,7 +1965,7 @@ colors = ['r', 'b']
 plt.figure()
 plt.xlabel('Cedula del estudiante')
 plt.ylabel('Gastos en condominio de los responsables economicos del estudiante')
-plt.title('Outliers: Gastos en condominio de los estudiantes')
+plt.title('Outliers: Gastos en condominio de los responsables economicos de los estudiantes')
 out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
 rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
 
@@ -1999,8 +1999,68 @@ for x in df['Otrosgastosdesusresponsableseconomicos']:
          
 df.Otrosgastosdesusresponsableseconomicos = df.Otrosgastosdesusresponsableseconomicos.astype(float)
 
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Otrosgastosdesusresponsableseconomicos'] - ndf6['Otrosgastosdesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Otrosgastosdesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Otrosgastosdesusresponsableseconomicos'] - ndf6['Otrosgastosdesusresponsableseconomicos'].mean()) > 1.96*ndf6['Otrosgastosdesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Otrosgastosdesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Otrosgastosdesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Otros gastos responsables economicos del estudiante')
+plt.title('Outliers: Otros gastos de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Otrosgastosdesusresponsableseconomicos.png')
+
 #------------------------------------------------------------------------------"Totaldeegresosdesusresponsableseconomicos"
 df['Totaldeegresosdesusresponsableseconomicos'] = df.Gastosenviviendadesusresponsableseconomicos + df.Gastosenalimentaciondesusresponsableseconomicos + df.Gastosentransportedesusresponsableseconomicos + df.Gastosmedicosdesusresponsableseconomicos + df.Gastosodontologicosdesusresponsableseconomicos + df.Gastoseducativosdesusresponsableseconomicos + df.Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos + df.Condominiodesusresponsableseconomicos + df.Otrosgastosdesusresponsableseconomicos
+df['Totaldeegresosdesusresponsableseconomicos'] = df['Totaldeegresosdesusresponsableseconomicos'].astype(float)
+
+ndf6 = df.copy()
+ndf6['x-Mean'] = abs(ndf6['Totaldeegresosdesusresponsableseconomicos'] - ndf6['Totaldeegresosdesusresponsableseconomicos'].mean())
+ndf6['1.96*std'] = 1.96*ndf6['Totaldeegresosdesusresponsableseconomicos'].std()  
+ndf6['Outlier'] = abs(ndf6['Totaldeegresosdesusresponsableseconomicos'] - ndf6['Totaldeegresosdesusresponsableseconomicos'].mean()) > 1.96*ndf6['Totaldeegresosdesusresponsableseconomicos'].std()
+
+#Grafico los outliers
+# data 
+idout = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == True)]
+out = ndf6['Totaldeegresosdesusresponsableseconomicos'][(ndf6['Outlier'] == True)]
+idnormal = ndf6['CedulaDeIdentidad'][(ndf6['Outlier'] == False)]
+normal = ndf6['Totaldeegresosdesusresponsableseconomicos'][(ndf6['Outlier'] == False)]
+colors = ['r', 'b']
+plt.figure()
+plt.xlabel('Cedula del estudiante')
+plt.ylabel('Total de egresos de los responsables economicos del estudiante')
+plt.title('Outliers: Total de egresos de los responsables economicos de los estudiantes')
+out = plt.scatter(idout, out, marker='x', color=colors[0], s=100)
+rest = plt.scatter(idnormal, normal, marker='o', color=colors[1], s=100)
+
+plt.legend((out, rest),
+           ('Outlier', 'Estudiante promedio'),
+           scatterpoints=1,
+           loc='lower left',
+           ncol=3,
+           fontsize=8)
+           
+
+plt.savefig('Totaldeegresosdesusresponsableseconomicos.png')
+
 #------------------------------------------------------------------------------"DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE"
 df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE = df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE.astype(int)
 mode(df.DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE)
@@ -2015,6 +2075,7 @@ mode(df.Sugerenciasyrecomendacionesparamejorarnuestraatencion)
 cols = ["CedulaDeIdentidad", "SemestreAcademicoarenovar", "AnoAcademicoarenovar", "DiadeNacimiento", "MesdeNacimiento", "AnodeNacimiento", "EstadoCivil", "Sexo", "Escuela", "AnodeIngresoalaUCV", "ModalidaddeIngresoalaUCV", "Semestrequecursa", 'HacambiadousteddedireccionyMotivo', "Numerodemateriaaprobadasenelsemestreoanoanterior", "Numerodemateriasretiradasenelsemestreoanoanterior", "Numerodemateriasreprobadasenelsemestreoanoanterior", "Promedioponderadoaprobado", "Eficiencia", "Sireprobounaomasmateriasindiqueelmotivo", "Numerodemateriasinscritasenelsemestreencurso", "SeencuentrarealizandotesisopasantiasdegradoyCantidad", "Procedencia", "LugardonderesidemientrasestudiaenlaUniversidad", "Personasconlascualesustedvivemientrasestudiaenlauniversidad", "Tipodeviviendadonderesidemientrasestudiaenlauniversidad", "Encasodevivirenhabitacionalquiladaoresidenciaestudiantilindiqueelmontomensual", "Direcciondondeseencuentraubicadalaresidenciaohabitacionalquilada", "HasolicitadoalgunotrobeneficioalaUniversidaduotraInstitucionyMotivo", "SeencuentraustedrealizandoalgunaactividadquelegenereingresosIndiqueActividad", "Montomensualdelabeca",  "Aportemensualquelebrindasuresponsableeconomico", "Aportemensualquerecibedefamiliaresoamigos", "Ingresomensualquerecibeporactividadesadestajooporhoras", "Gastosenalimentacionpersonal", "Gastosentransportepersonal", "Gastosmedicospersonal", "Gastosodontologicospersonal", "Gastospersonales", "Gastosenresidenciaohabitacionalquiladapersonal", "GastosenMaterialesdeestudiopersonal", "Gastosenrecreacionpersonal", "Otrosgastospersonal", "Indiquequienessuresponsableeconomico", "Cargafamiliar", "Ingresomensualdesuresponsableeconomico", "Otrosingresos", "Gastosenviviendadesusresponsableseconomicos", "Gastosenalimentaciondesusresponsableseconomicos",  "Gastosentransportedesusresponsableseconomicos", "Gastosmedicosdesusresponsableseconomicos", "Gastosodontologicosdesusresponsableseconomicos", "Gastoseducativosdesusresponsableseconomicos", "Gastosenserviciospublicosdeagualuztelefonoygasdesusresponsableseconomicos", "Condominiodesusresponsableseconomicos", "Otrosgastosdesusresponsableseconomicos", "DeseamosconocerlaopiniondenuestrosusuariosparamejorarlacalidaddelosserviciosofrecidosporelDptodeTrabajoSocialOBE", "Sugerenciasyrecomendacionesparamejorarnuestraatencion"]
 df = df[cols]
 df = df.sort_values(by='CedulaDeIdentidad', ascending= True)
+df.info()
 #df.describe()
 #df.head()
 #Genero el .cvs a partir del dataframe
